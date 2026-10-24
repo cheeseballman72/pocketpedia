@@ -1,0 +1,816 @@
+:root {
+  --ink-0: #0f2250; --ink-1: #1c3566; --ink-2: #25458a; --ink-3: #4f78c4;
+  /* Theme colors (see themes.css): glass panels, deep insets, and edges as "r, g, b"; the full-screen scene behind views. */
+  --glass: 10, 24, 60; --deep: 5, 12, 30; --edge: 160, 190, 255;
+  --scene: radial-gradient(ellipse at 50% 40%, #2a4f96, #0f2250 62%, #071330);
+  --home-bg: radial-gradient(ellipse at 55% 40%, #4f78c4, #25458a 45%, #0f2250);
+  --orange: #f5a623; --gold: #ffd27a; --sky: #aac0e6;
+  --bar-line: #2b2f38; --bar-edge: #3a4050;
+  --fs: 1;
+  --read-font: Georgia, "Times New Roman", serif;
+}
+:root[data-font="sans"] { --read-font: "Segoe UI", Tahoma, sans-serif; }
+/* Animations turned off in Options. */
+.no-anim *, .no-anim *::before, .no-anim *::after { animation: none !important; transition: none !important; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
+body { font-family: "Segoe UI", Tahoma, sans-serif; color: #fff; user-select: none; cursor: default; }
+button { font-family: inherit; cursor: default; }
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+/* ---------- title bar ---------- */
+.titlebar { height: 28px; flex: none; display: flex; align-items: center; gap: 8px; padding-left: 8px;
+            background: linear-gradient(#2a2a2a, #0d0d0d); color: #ddd; font-size: 12px; -webkit-app-region: drag; }
+.titlebar .emb { width: 16px; height: 16px; }
+.titlebar .wc { margin-left: auto; display: flex; height: 100%; -webkit-app-region: no-drag; }
+.titlebar .wc button { width: 46px; height: 100%; border: 0; background: transparent; color: #bbb;
+                       display: grid; place-items: center; }
+/* Window button icons: 10px line drawings, like the Windows caption glyphs. */
+.wi { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1px; shape-rendering: crispEdges; }
+.wi.x { shape-rendering: geometricPrecision; }
+/* macOS: the system's close, minimize, and zoom buttons sit at the left of the title bar, the title is centered,
+   and the menus are in the menu bar at the top of the screen. */
+[data-platform="darwin"] .titlebar { padding-left: 78px; padding-right: 78px; }
+[data-platform="darwin"] .titlebar .emb, [data-platform="darwin"] .titlebar .wc, [data-platform="darwin"] .menubar { display: none; }
+[data-platform="darwin"] .titlebar > span { flex: 1; text-align: center; }
+[data-platform="darwin"].fullscreen .titlebar { padding-left: 8px; padding-right: 8px; }
+.titlebar .wc button:hover { background: #2c2c2c; color: #fff; }
+.titlebar .wc button.close:hover { background: #c42b1c; }
+
+/* ---------- menu bar ---------- */
+.menubar { height: 22px; flex: none; display: flex; padding: 0 4px; background: #000; font-size: 12px; position: relative; z-index: 40; }
+.menubar .m { position: relative; padding: 0 9px; line-height: 22px; color: #e8e8e8; }
+.menubar .m:hover, .menubar .m.open { background: var(--ink-2); }
+.menu { position: absolute; top: 22px; left: 0; min-width: 230px; padding: 3px; background: #16181d; border: 1px solid var(--bar-edge);
+        box-shadow: 3px 4px 10px rgba(0, 0, 0, .6); }
+.menu .mi { display: flex; justify-content: space-between; gap: 28px; padding: 4px 12px 4px 26px; line-height: 16px; color: #e8e8e8; position: relative; white-space: nowrap; }
+.menu .mi:hover { background: var(--ink-2); }
+.menu .mi .k { color: #8a93a6; }
+.menu .mi.checked::before { content: "\2713"; position: absolute; left: 9px; }
+.menu .mi.disabled { color: #5d6474; }
+.menu .mi.disabled:hover { background: transparent; }
+.menu .msep { height: 1px; margin: 3px 2px; background: #30343e; }
+
+/* ---------- toolbar: flat buttons that sit inside the dark band ---------- */
+.toolbar { height: 38px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 8px; position: relative; z-index: 30;
+           background: linear-gradient(#17191e, #050608); border-top: 1px solid #23262d; border-bottom: 1px solid var(--bar-line); }
+.find { display: flex; align-items: center; flex: 0 1 auto; min-width: 0; }
+.find label { margin-right: 7px; font-size: 12px; color: #cfd6e2; }
+.field { position: relative; display: flex; flex: 0 1 230px; width: 230px; min-width: 140px; height: 24px; background: #0a0c10; border: 1px solid var(--bar-edge); }
+.field:focus-within { border-color: var(--orange); }
+.field input { flex: 1; min-width: 0; padding: 0 7px; border: 0; outline: none; background: transparent; color: #fff; font: 12px "Segoe UI"; user-select: text; }
+.field input::placeholder { color: #5d6474; }
+.field .dd { width: 20px; border: 0; border-left: 1px solid var(--bar-edge); background: #14171d; color: #8a93a6; font-size: 8px; }
+.field .dd:hover { background: #232731; color: #fff; }
+.go { height: 24px; margin-left: 4px; padding: 0 14px 2px; line-height: 1; background: linear-gradient(#2b303a, #1b1e25); border: 1px solid #4a5262;
+      color: var(--orange); font: 700 12px "Segoe UI"; }
+.go:hover { background: #333a48; border-color: var(--orange); }
+.go:active { background: #0c0e12; }
+.tbtn { height: 28px; min-width: 30px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0;
+        background: transparent; border: 1px solid transparent; color: #cfd6e2; font-size: 12px; }
+.tbtn.lbl { padding: 0 9px; }
+.tbtn .ic { width: 16px; height: 16px; fill: currentColor; flex: none; }
+.tbtn:hover { background: #232731; border-color: var(--bar-edge); color: #fff; }
+.tbtn:active { background: #0c0e12; border-color: var(--bar-line); box-shadow: inset 0 1px 3px rgba(0, 0, 0, .7); }
+.tbtn.on { color: var(--orange); background: #1b1f28; border-color: #4a3a1a; }
+.tbtn:disabled { color: #454b59; background: transparent; border-color: transparent; box-shadow: none; }
+.vol { position: relative; margin-left: auto; }
+.volpop { position: absolute; right: 0; top: 31px; width: 250px; padding: 8px 10px 9px; z-index: 60;
+          background: #16181d; border: 1px solid var(--bar-edge); box-shadow: 3px 5px 14px rgba(0, 0, 0, .65); }
+.volpop .vh { margin-bottom: 4px; font: 600 11px "Segoe UI"; letter-spacing: 2px; text-transform: uppercase; color: var(--orange); }
+.volpop .vrow { display: flex; align-items: center; gap: 8px; }
+.volpop .vnote { margin-top: 5px; font: 11px "Segoe UI"; color: #6f7890; }
+#volpct { width: 44px; text-align: right; font: 11px Consolas, monospace; color: #cfd6e2; }
+#volrange { flex: 1; height: 16px; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; }
+#volrange::-webkit-slider-runnable-track { height: 4px; border: 1px solid var(--bar-edge);
+  background: linear-gradient(90deg, var(--orange) var(--p, 100%), #0a0c10 var(--p, 100%)); }
+#volrange::-webkit-slider-thumb { -webkit-appearance: none; width: 9px; height: 16px; margin-top: -7px;
+  background: linear-gradient(#e8ecf2, #9aa3b5); border: 1px solid #000; }
+#volrange:focus { outline: none; }
+#volrange:focus-visible::-webkit-slider-thumb { outline: 1px solid var(--orange); }
+.volpop.muted #volrange::-webkit-slider-runnable-track { background: linear-gradient(90deg, #4a5262 var(--p, 100%), #0a0c10 var(--p, 100%)); }
+.tbtn.home-btn { height: 30px; padding: 0 10px 0 6px; font-weight: 600; color: #fff; }
+.tbtn.home-btn img { width: 22px; height: 22px; filter: drop-shadow(0 0 4px rgba(190, 215, 255, .6)); transition: filter .15s; }
+.tbtn.home-btn:hover img { filter: drop-shadow(0 0 7px rgba(255, 220, 160, .9)); }
+.tsep { width: 1px; height: 22px; margin: 0 6px; background: var(--bar-line); box-shadow: 1px 0 #000; }
+
+.suggest { position: absolute; top: 24px; left: -1px; width: 380px; max-height: 420px; overflow: auto; z-index: 60;
+           background: #0d1017; border: 1px solid var(--bar-edge); box-shadow: 3px 5px 14px rgba(0, 0, 0, .65); }
+.suggest .si { display: flex; gap: 9px; align-items: center; padding: 5px 8px; border-bottom: 1px solid #1a1e27; }
+.suggest .si.sel, .suggest .si:hover { background: var(--ink-2); }
+.suggest .si .th { width: 34px; height: 34px; flex: none; background: #1c3566 center/cover; border: 1px solid #2f3b55; }
+.suggest .si .th.ph { display: grid; place-items: center; background: linear-gradient(160deg, #1f3a6e, #152a52); color: #8ea5d6; }
+.suggest .si .th.ph svg { width: 20px; height: 20px; fill: currentColor; }
+.suggest .si b { display: block; font: 600 12.5px "Segoe UI"; color: #fff; }
+.suggest .si span { display: block; font: 11px "Segoe UI"; color: #8a93a6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 310px; }
+.suggest .empty { padding: 8px 10px; font-size: 12px; color: #8a93a6; }
+
+/* ---------- status bar ---------- */
+.statusbar { height: 25px; flex: none; display: flex; align-items: stretch; background: #000; border-top: 1px solid #23262d; color: #9aa3b5; font-size: 12px; }
+.statusbar .sb { display: flex; align-items: center; gap: 6px; padding: 0 10px 2px; line-height: 1; border-right: 1px solid #1d2027; white-space: nowrap; }
+/* Segoe UI's letters sit high in their line box; nudge the dot down to line up with the middle of the text. */
+.statusbar .dot { margin-top: 2px; }
+.statusbar .sb.grow { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.statusbar .sb:last-child { border-right: 0; }
+.statusbar .sup { color: #c9d2e3; text-decoration: underline; text-decoration-color: rgba(201, 210, 227, .35); }
+.statusbar .sup:hover { color: var(--gold); text-decoration-color: var(--gold); }
+.statusbar .upd { color: #fff; background: linear-gradient(var(--ink-2), var(--ink-1)); }
+.statusbar .upd[hidden] { display: none; }
+.statusbar .upd button { margin: 0 0 0 4px; padding: 1px 8px 2px; background: var(--orange); border: 0; color: #1a1406; font: 600 11.5px "Segoe UI"; }
+.statusbar .upd button:hover { background: var(--gold); }
+.statusbar .beta { padding: 1px 5px; border-radius: 2px; background: var(--orange); color: #1a1406; font: 700 10px "Segoe UI"; letter-spacing: 1px; }
+
+/* ---------- Send Feedback dialog ---------- */
+.dialog.feedback { width: 470px; }
+.donate .fbopt i.wp { background: #3a3a3a; font-family: Georgia, "Times New Roman", serif; }
+.donate .fbopt i.tip { background: #e0565b; }
+.donate p.fine { margin-top: 2px; font-size: 11.5px; color: var(--sky); }
+.fbopts { display: grid; gap: 8px; margin: 12px 0 10px; }
+.fbopt { display: flex; gap: 12px; align-items: center; width: 100%; padding: 10px 12px; text-align: left; background: rgba(var(--deep), .45);
+         border: 1px solid rgba(var(--edge), .3); color: #fff; font: 13px/1.35 "Segoe UI"; }
+.fbopt:hover, .fbopt:focus-visible { border-color: var(--orange); background: rgba(245, 166, 35, .12); outline: none; }
+.fbopt i { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font: 700 16px "Segoe UI"; font-style: normal; color: #fff; }
+.fbopt b { display: block; font-weight: 600; color: var(--gold); }
+.fbopt span { display: block; color: var(--sky); font-size: 12px; }
+.fbver { display: flex; align-items: center; gap: 10px; margin-top: 4px; padding: 7px 10px; background: rgba(0, 0, 0, .3); border: 1px solid rgba(var(--edge), .18);
+         font: 12px "Segoe UI"; color: var(--sky); }
+.fbver code { flex: 1; font: 12px Consolas, monospace; color: #e6eefc; }
+.fbver button { padding: 2px 10px; background: linear-gradient(#2b303a, #1b1e25); border: 1px solid #4a5262; color: var(--orange); font: 600 11.5px "Segoe UI"; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: #3fbf4a; box-shadow: 0 0 4px #3fbf4a; }
+.dot.red { background: #d23a3a; box-shadow: 0 0 4px #d23a3a; }
+.dot.blue { background: #4fa3ff; box-shadow: 0 0 4px #4fa3ff; }
+.dot.grey { background: #8f9dbd; box-shadow: 0 0 4px #8f9dbd; }
+.dot.amber { background: #f5a623; box-shadow: 0 0 4px #f5a623; }
+/* the connection light and its menu */
+.statusbar .netbtn { cursor: default; padding: 0 8px; }
+.statusbar .netbtn:hover { background: rgba(255, 255, 255, .06); }
+.statusbar .netbtn.open { background: rgba(245, 166, 35, .16); box-shadow: inset 0 0 0 1px var(--orange); }
+.statusbar .netbtn .caret { margin-left: 4px; }
+.netpop { position: fixed; z-index: 200; width: 340px; padding: 6px; background: linear-gradient(var(--ink-2), var(--ink-0)); border: 1px solid var(--ink-3); box-shadow: 0 10px 30px rgba(0, 0, 0, .6); font: 12.5px "Segoe UI"; color: #dbe5f7; }
+.netpop .hd { padding: 4px 8px 6px; font: 600 10.5px "Segoe UI"; letter-spacing: 1.5px; text-transform: uppercase; color: #8f9dbd; }
+.netpop .note { margin: 0 2px 6px; padding: 7px 8px; background: rgba(245, 166, 35, .12); border-left: 2px solid var(--orange); color: #f3d9ad; font-size: 11.5px; line-height: 1.4; }
+.netpop .it { display: flex; gap: 10px; align-items: flex-start; padding: 7px 8px; }
+.netpop .it:hover, .netpop .lnk:hover { background: rgba(245, 166, 35, .14); }
+.netpop .rb { width: 11px; height: 11px; margin-top: 3px; border-radius: 50%; border: 1px solid #8f9dbd; flex: none; }
+.netpop .it.on .rb { border-color: var(--orange); background: radial-gradient(circle, var(--orange) 0 45%, transparent 50%); }
+.netpop b { color: #fff; font-weight: 600; }
+.netpop .it b { display: block; }
+.netpop .s { display: block; color: #9fb0cf; font-size: 11.5px; line-height: 1.35; }
+.netpop .cb { display: flex; gap: 10px; align-items: flex-start; padding: 7px 8px; }
+.netpop .cb input { accent-color: var(--orange); margin: 2px 0 0; }
+.netpop .cb.dis { opacity: .45; }
+.netpop hr { margin: 5px 6px; border: 0; border-top: 1px solid var(--ink-3); }
+.netpop .lib { padding: 6px 8px 2px; color: #9fb0cf; font-size: 11.5px; line-height: 1.4; }
+.netpop .lnk { display: flex; align-items: center; gap: 8px; padding: 7px 8px; color: #fff; }
+.netpop .lnk .ic { width: 14px; height: 14px; fill: currentColor; }
+/* a row in the search suggestions that does something (Go online) */
+.suggest .si.act { background: #141a26; }
+.suggest .si.act .th { display: grid; place-items: center; background: none; border-color: transparent; color: var(--orange); }
+.suggest .si.act .th .ic { width: 18px; height: 18px; fill: currentColor; }
+.suggest .si.act b { color: var(--orange); }
+.statusbar.busy #status::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%;
+                                  background: var(--orange); animation: pulse .8s ease-in-out infinite alternate; vertical-align: 0; }
+@keyframes pulse { from { opacity: .25; } to { opacity: 1; } }
+
+/* ---------- main view ---------- */
+/* ---------- location bar (breadcrumbs), hidden on Home ---------- */
+.crumbs { height: 25px; flex: none; display: flex; align-items: center; min-width: 0; padding: 0 12px; position: relative; z-index: 20; overflow: hidden; white-space: nowrap;
+          background: linear-gradient(#0e1118, #08090d); border-bottom: 1px solid #23262d; font: 12px "Segoe UI"; color: #8a93a6; }
+.crumbs[hidden] { display: none; }
+.crumbs .lbl { flex: none; margin-right: 10px; font: 600 10px "Segoe UI"; letter-spacing: 2px; color: #5d6474; }
+.crumbs img { flex: none; width: 14px; height: 14px; margin-right: 6px; }
+.crumbs a, .crumbs .step, .crumbs .here { min-width: 0; overflow: hidden; text-overflow: ellipsis; padding: 2px 4px; border: 1px solid transparent; }
+.crumbs a { flex: 0 1 auto; color: #cfd6e2; text-decoration: none; }
+.crumbs a:hover { color: #ffd27a; border-color: #3a4050; background: #1b1f28; }
+.crumbs .step { flex: 0 1 auto; color: #cfd6e2; }
+.crumbs .sep { flex: none; margin: 0 4px; color: #5d6474; }
+.crumbs .here { flex: 0 1 auto; color: #fff; font-weight: 600; }
+
+/* ---------- Favorites pane: slides in over the page from the left, on any screen ---------- */
+.stage { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
+.fpane { position: absolute; left: 0; top: 0; bottom: 0; width: 250px; z-index: 25; display: flex; flex-direction: column; color: #fff;
+         background: linear-gradient(var(--ink-2), var(--ink-0)); border-right: 1px solid var(--ink-3); box-shadow: 6px 0 18px rgba(0, 0, 0, .45); animation: fpane-in .18s ease-out; }
+.fpane[hidden] { display: none; }
+@keyframes fpane-in { from { transform: translateX(-24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.fpane .fh { height: 26px; flex: none; display: flex; align-items: center; gap: 7px; padding: 0 4px 0 10px;
+             background: linear-gradient(#2a2a2a, #0d0d0d); font: 600 12px "Segoe UI"; color: #ddd; }
+.fpane .fh .ic { width: 13px; height: 13px; fill: var(--orange); }
+.fpane .fh span { flex: 1; }
+.fpane .fh button { width: 22px; height: 20px; padding: 0; background: none; border: 1px solid transparent; color: #aaa; display: grid; place-items: center; }
+.fpane .fh button:hover { color: #fff; border-color: #4a5262; background: #1b1f28; }
+.fpane .fb { flex: 1; overflow: auto; padding: 12px 14px; }
+.fpane .add { display: flex; align-items: center; gap: 7px; width: 100%; margin-bottom: 12px; padding: 5px 8px; text-align: left;
+              background: rgba(var(--deep), .35); border: 1px solid rgba(var(--edge), .3); color: var(--gold); font: 600 12px "Segoe UI"; }
+.fpane .add .ic { width: 12px; height: 12px; fill: var(--orange); flex: none; }
+.fpane .add span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fpane .add:hover { border-color: var(--orange); }
+.fpane h4 { margin: 0 0 6px; font: 600 15px "Segoe UI"; color: var(--orange); }
+.fpane hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, .3); }
+.fpane .lnk { position: relative; display: block; width: 100%; padding: 2px 0 2px 26px; background: none; border: 0; text-align: left;
+              font: 13px/1.5 "Segoe UI"; color: var(--sky); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fpane .lnk.plain { padding-left: 10px; }
+.fpane .lnk .ic { position: absolute; left: 9px; top: 6px; width: 11px; height: 11px; fill: var(--orange); }
+.fpane .lnk:hover { color: var(--gold); }
+.fpane .lnk.here { color: #fff; font-weight: 600; }
+.fpane .more { display: block; margin: 4px 0 0 26px; padding: 0; background: none; border: 0; font: 600 12px "Segoe UI"; color: #fff;
+               text-decoration: underline; text-decoration-color: rgba(255, 255, 255, .4); }
+.fpane .more:hover { color: var(--gold); }
+.fpane .note { font: 11.5px/1.45 "Segoe UI"; color: var(--sky); }
+.fpane .ff { flex: none; padding: 6px 14px; font: 11px "Segoe UI"; color: var(--sky); border-top: 1px solid rgba(255, 255, 255, .15); }
+
+#view { flex: 1; position: relative; overflow: hidden; background: var(--home-bg); }
+.fade-in { animation: viewin .25s ease-out both; }
+@keyframes viewin { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- home ---------- */
+.home { position: absolute; inset: 0; overflow: hidden; }
+.home-canvas { position: absolute; left: 50%; top: 50%; width: 1024px; height: 610px; transform: translate(-50%, -50%) scale(var(--s, 1)); }
+.home-art { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
+.home .brand { position: absolute; left: 34px; top: 24px; color: #fff; }
+.home .brand small { display: block; margin-bottom: -2px; font: 300 22px "Segoe UI"; }
+.home .brand .y { font: 600 64px/1 "Segoe UI"; letter-spacing: 2px; }
+.home .brand .tag { margin-top: 6px; font: 600 9.5px "Segoe UI"; letter-spacing: 4px; color: var(--sky); }
+.home .dial { position: absolute; left: 423px; top: 18px; width: 280px; height: 280px; padding: 0; border-radius: 50%; overflow: hidden;
+              background: #3a5f99 center/cover; border: 4px solid rgba(255, 255, 255, .82);
+              box-shadow: 0 0 0 1px rgba(0, 0, 0, .35), 0 6px 24px rgba(0, 0, 0, .55), 0 0 50px rgba(160, 195, 255, .55); transition: box-shadow .2s; }
+.home .dial::after { content: ""; position: absolute; inset: 0; border-radius: 50%;
+                     background: radial-gradient(ellipse at 40% 16%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 44%), radial-gradient(circle, transparent 62%, rgba(0, 0, 0, .35)); }
+.home .dial:hover { box-shadow: 0 0 0 1px rgba(0, 0, 0, .35), 0 6px 24px rgba(0, 0, 0, .55), 0 0 70px rgba(255, 220, 160, .7); }
+.home .dialcap { position: absolute; left: 398px; top: 312px; width: 330px; padding: 4px 10px; border-radius: 6px; background: rgba(var(--glass), .6);
+                 text-align: center; color: #e6eefc; font: 12px/1.4 "Segoe UI"; text-shadow: 0 1px 3px #000; }
+.home .dialcap b { font: 600 10px "Segoe UI"; letter-spacing: 3px; color: var(--orange); }
+/* Clamp the caption itself, so a third line can't peek out through the box's bottom padding. */
+.home .dialcap span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.home .orb { min-width: 74px; padding: 0; white-space: nowrap; background: none; border: 0; text-align: center; color: #fff;
+             font: 600 12px "Segoe UI"; text-shadow: 0 1px 3px #000, 0 0 6px #000; }
+.home .orb i { position: relative; display: grid; place-items: center; width: 52px; height: 52px; margin: 0 auto 4px; border-radius: 50%; overflow: hidden; background: var(--orb-bg);
+               border: 2px solid rgba(255, 255, 255, .75); box-shadow: 0 0 0 1px rgba(0, 0, 0, .35), 0 4px 14px rgba(0, 0, 0, .55), 0 0 22px rgba(140, 180, 255, .45);
+               transition: transform .15s, box-shadow .15s; }
+/* A glassy shine along the top edge, kept clear of the icon so the white icons stand out. */
+.home .orb i::after { content: ""; position: absolute; left: 10%; right: 10%; top: 3%; height: 34%; border-radius: 50% 50% 45% 45% / 70% 70% 30% 30%;
+                      background: linear-gradient(rgba(255, 255, 255, .6), rgba(255, 255, 255, .04)); }
+.home .orb i svg { position: relative; z-index: 1; width: 24px; height: 24px; fill: #fff; filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, .75)) drop-shadow(0 0 3px rgba(0, 0, 0, .35)); }
+.home .orb:hover { color: var(--gold); }
+.home .orb:hover i { transform: scale(1.08); box-shadow: 0 0 0 1px rgba(0, 0, 0, .35), 0 4px 14px rgba(0, 0, 0, .55), 0 0 30px rgba(255, 220, 160, .7); }
+.home .orb:active i { transform: scale(.97); }
+.panel { position: absolute; padding: 12px 14px 14px; border-radius: 6px; color: #fff;
+         background: linear-gradient(rgba(var(--glass), .72), rgba(var(--glass), .55)); border: 1px solid rgba(var(--edge), .25); box-shadow: 0 6px 20px rgba(0, 0, 0, .35); }
+.panel h3 { margin: 0 0 8px; padding-bottom: 4px; font: 600 15px "Segoe UI"; color: var(--orange); border-bottom: 1px solid rgba(255, 255, 255, .3); }
+.home .disc { left: 34px; top: 176px; width: 300px; }
+.home .shelf { position: absolute; left: 34px; top: 458px; width: 740px; height: 134px; padding: 14px 20px 0; border-radius: 8px;
+               background: linear-gradient(rgba(var(--glass), .55), rgba(var(--glass), .75)); border: 1px solid rgba(var(--edge), .25);
+               box-shadow: 0 6px 20px rgba(0, 0, 0, .35), inset 0 1px rgba(255, 255, 255, .12); }
+.home .shelf small { display: block; font: 600 10px "Segoe UI"; letter-spacing: 3px; color: var(--orange); }
+.home .shelf .row { display: flex; justify-content: space-around; margin-top: 18px; }
+.home .disc .row { display: flex; gap: 10px; }
+.home .disc .thumb { flex: none; width: 60px; height: 60px; border-radius: 50%; background: #3a5f99 center/cover; border: 2px solid rgba(255, 255, 255, .8); box-shadow: 0 0 14px rgba(140, 180, 255, .5); }
+.home .disc b { display: block; font: 600 italic 14px "Segoe UI"; color: var(--gold); }
+.home .disc p { margin: 2px 0 0; font: 12px/1.45 "Segoe UI"; color: #e6eefc; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+.home .disc .more, .home .alm .more { display: inline-block; margin-top: 10px; padding: 0; background: none; border: 0; font: 600 12px "Segoe UI"; color: #fff; }
+.home .disc .more:hover, .home .alm .more:hover { color: var(--gold); text-decoration: underline; }
+.home .alm { right: 18px; top: 18px; bottom: 18px; width: 214px; display: flex; flex-direction: column; }
+.home .alm .d { margin: -4px 0 10px; font: 600 10px "Segoe UI"; letter-spacing: 3px; color: var(--sky); }
+.home .alm .list { flex: 1; overflow: hidden; }
+.home .alm .ev { position: relative; display: block; width: 100%; padding: 0 0 10px 16px; background: none; border: 0; text-align: left; color: #fff; }
+.home .alm .ev::before { content: ""; position: absolute; left: 1px; top: 6px; width: 5px; height: 5px; background: #8fb4ff; transform: rotate(45deg); }
+.home .alm .ev b { font: 600 13px "Segoe UI"; }
+.home .alm .ev div { font: 11.5px/1.35 "Segoe UI"; color: var(--sky); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.home .alm .ev:hover b, .home .alm .ev:hover div { color: var(--gold); }
+/* offline, an event whose article isn't in the library: plain, dimmer text */
+.home .alm .ev.nolink { cursor: default; }
+.home .alm .ev.nolink b, .home .alm .ev.nolink:hover b { color: rgba(255, 255, 255, .6); }
+.home .alm .ev.nolink div, .home .alm .ev.nolink:hover div { color: rgba(185, 205, 240, .55); }
+.home .alm .ev.nolink::before { background: rgba(143, 180, 255, .4); }
+.home .muted { font: 12px "Segoe UI"; color: var(--sky); }
+
+/* ---------- page shell (articles and feature pages) ---------- */
+.page { position: absolute; inset: 0; display: flex; background: #e9eef5; }
+.rail { width: 230px; flex: none; position: relative; overflow: hidden; color: #fff; background: linear-gradient(var(--ink-2), var(--ink-0)); }
+.rail > svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.rail .in { position: absolute; inset: 0; overflow: hidden auto; scrollbar-gutter: stable; padding: 14px 4px 14px 14px; }
+.rail h4 { margin: 0 0 6px; font: 600 15px "Segoe UI"; color: var(--orange); }
+.rail hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, .3); }
+.rail .lnk { display: block; width: 100%; padding: 2px 0 2px 10px; background: none; border: 0; border-left: 3px solid transparent; text-align: left;
+             font: 600 12.5px/1.5 "Segoe UI"; color: #fff; }
+.rail .lnk:hover { color: var(--gold); }
+.rail .lnk.on { background: linear-gradient(90deg, rgba(245, 166, 35, .3), transparent); border-left-color: var(--orange); padding-left: 7px; }
+.rail .lnk.sub { font-weight: 400; color: var(--sky); }
+.rail .lnk.sub:hover { color: var(--gold); }
+.rail .lnk .n { float: right; color: var(--sky); font-weight: 400; }
+.rail .note { font-size: 11.5px; color: var(--sky); line-height: 1.45; }
+/* Rail sections fold from their headings; a closed one shows a summary instead. */
+.rail .rsec + .rsec { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, .3); }
+.rail h4.fold { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; outline: none; }
+.rail h4.fold::before { content: "▾"; width: 10px; flex: none; font-size: 12px; color: var(--sky); transition: transform .15s; }
+.rail h4.fold.shut { margin-bottom: 0; }
+.rail h4.fold.shut::before { transform: rotate(-90deg); }
+.rail h4.fold:focus-visible { outline: 1px dotted var(--sky); outline-offset: 2px; }
+.rail h4.fold .n { display: none; margin-left: auto; font: 400 11.5px "Segoe UI"; color: var(--sky); }
+.rail h4.fold.shut .n { display: inline; }
+/* The Media box */
+.rail .mcount { display: flex; flex-wrap: wrap; gap: 0 2px; margin: 0 0 0 -5px; font-size: 11.5px; color: var(--sky); }
+.rail .mcount b { font-weight: 600; color: #fff; }
+.rail .mcount > * { display: inline-flex; align-items: center; gap: .25em; height: 21px; padding: 0 5px 1px; border: 0; border-radius: 3px; background: none; font: inherit; color: inherit; }
+.rail .mcount button { cursor: pointer; }
+.rail .mcount button:hover { color: var(--gold); }
+.rail .mcount button.on { background: var(--ink-0); box-shadow: inset 0 0 0 1px var(--ink-3); color: #fff; }
+.mbox { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 6px 0 4px; }
+.mt { position: relative; aspect-ratio: 1; padding: 0; overflow: hidden; background: #0a1430 center / cover; border: 1px solid rgba(255, 255, 255, .25); cursor: pointer; }
+.mt:hover { border-color: var(--gold); }
+.mt b { position: absolute; left: 3px; bottom: 3px; padding: 0 4px; border-radius: 2px; background: rgba(0, 0, 0, .65); font: 600 9.5px/15px "Segoe UI"; color: #fff; }
+.mt.audio { background: linear-gradient(135deg, #2a4f96, #12285a); }
+.mt.audio b { top: 4px; bottom: auto; }
+.mt .wave { position: absolute; left: 7px; right: 7px; top: 22px; height: 12px; display: flex; align-items: center; gap: 2px; }
+.mt .wave i, .mstage .wave i { flex: 1; border-radius: 1px; background: #ffd27a; opacity: .75; }
+.mt .lbl { position: absolute; left: 5px; right: 4px; bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  font: 600 9.5px/1.2 "Segoe UI"; color: #fff; text-align: left; }
+.rail .lnk.mall { margin-top: 4px; }
+.art { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.band { height: 96px; flex: none; position: relative; overflow: hidden; color: #fff; background: var(--ink-1); }
+.band > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.band .t { position: absolute; left: 22px; right: 360px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; }
+/* Article titles can be long, so an article's buttons sit at the top right and the title goes below them at full width. */
+.band.article .t { left: var(--flow-left, 22px); right: var(--flow-right, 22px); top: var(--tools-bottom, 42px); padding-bottom: 10px; }
+.band.article .desc { margin-top: 5px; }
+/* Room below the line keeps descenders (g, y, p) from being clipped by overflow: hidden. */
+.band h1 { margin: 0 0 -6px; padding-bottom: 6px; font: 300 34px/1.15 "Segoe UI"; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 4px rgba(0, 0, 0, .4); }
+/* Help › Keyboard Shortcuts: two columns of groups, each key drawn as a keycap */
+.dialog.keys { width: 640px; }
+.keys .kcols { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 28px; margin-top: 6px; }
+.keys h3 { margin: 12px 0 4px; font: 600 10.5px "Segoe UI"; letter-spacing: 1.8px; text-transform: uppercase; color: var(--orange); }
+.keys .kr { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 3px 0; border-bottom: 1px solid rgba(255, 255, 255, .07); font: 12.5px "Segoe UI"; }
+.keys .kr span:first-child { color: #dbe5f7; }
+.keys kbd { display: inline-block; min-width: 18px; padding: 1px 6px; margin-left: 3px; text-align: center; font: 600 11px "Segoe UI"; color: #fff;
+  background: linear-gradient(#3a4562, #232a3d); border: 1px solid #56617f; border-bottom-width: 2px; border-radius: 3px; }
+.keys .kplus { color: #8a93a6; font-size: 11px; margin-left: 3px; }
+/* Find in article (Ctrl+F): the bar under the title band, and the highlights in the text */
+.findbar { position: fixed; z-index: 50; display: flex; align-items: center; gap: 6px; padding: 6px 6px 6px 12px;
+  background: linear-gradient(var(--ink-2), var(--ink-1)); border: 1px solid var(--ink-3); border-top: 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .35); font: 12.5px "Segoe UI"; color: #dbe5f7; }
+.findbar label { color: #aac0e6; margin-right: 2px; }
+.findbar input { width: 190px; height: 24px; padding: 0 8px; border: 1px solid var(--orange); background: #0a0c10; color: #fff;
+  font: 13px "Segoe UI"; outline: none; box-shadow: 0 0 0 2px rgba(245, 166, 35, .18); }
+.findbar.none input { border-color: #d65a4a; box-shadow: 0 0 0 2px rgba(214, 90, 74, .25); }
+.findbar .n { min-width: 70px; text-align: center; color: #aac0e6; }
+.findbar button { width: 26px; height: 26px; border: 1px solid var(--ink-3); background: rgba(255, 255, 255, .06); color: #fff; font: 15px "Segoe UI"; line-height: 1; padding: 0 0 2px; }
+.findbar button:hover { border-color: var(--orange); }
+.findbar button.x { border-color: transparent; background: none; color: #aac0e6; }
+.findbar button.x:hover { color: #fff; }
+mark.fh { background: rgba(255, 210, 122, .55); color: inherit; border-radius: 2px; box-shadow: 0 0 0 1px rgba(245, 166, 35, .35); }
+mark.fh.cur { background: var(--orange); color: #1a1000; box-shadow: 0 0 0 2px var(--orange), 0 0 10px rgba(245, 166, 35, .7); }
+@media print { mark.fh, mark.fh.cur { background: none; box-shadow: none; color: inherit; } }
+.band .desc { font: 12px "Segoe UI"; color: #d6e2fa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.band .tools { position: absolute; right: 14px; top: 0; bottom: 0; display: flex; align-items: center; gap: 6px; }
+.band.article .tools { right: var(--flow-right, 14px); bottom: auto; top: 10px; align-items: flex-start; }
+.band.article { height: 104px; }
+/* Without a description, the title drops so its lowest letters (g, y) line up with where a description would end. */
+.band.article.no-desc h1 { transform: translateY(10px); }
+/* The title row: the title, then a pronunciation button when Wikipedia has a recording. */
+.band .trow { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.band .trow h1 { min-width: 0; }
+.band.article.no-desc .trow .pron { transform: translateY(8px); }
+.band .pron { flex: none; width: 30px; height: 30px; margin-top: 4px; display: grid; place-items: center; border: 1px solid rgba(255, 255, 255, .5); border-radius: 50%;
+  background: rgba(0, 0, 0, .25); color: #fff; cursor: pointer; transition: background .15s, border-color .15s; }
+.band .pron .ic { width: 15px; height: 15px; fill: currentColor; }
+.band .pron:hover { background: rgba(255, 255, 255, .18); border-color: #fff; }
+.band .pron.on { background: var(--orange); border-color: var(--orange); color: #141a2e; }
+.bbtn { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; background: rgba(var(--deep), .45); border: 1px solid rgba(255, 255, 255, .35);
+        color: #fff; font: 600 11px "Segoe UI"; }
+.bbtn .ic { width: 13px; height: 13px; fill: currentColor; }
+.bbtn:hover { background: rgba(var(--deep), .7); border-color: var(--orange); color: var(--gold); }
+.bbtn.on { color: var(--orange); border-color: var(--orange); }
+.content { flex: 1; min-height: 0; overflow: auto; display: flex; align-items: flex-start; gap: 22px; padding: 18px 24px 30px; background: #fbfcfe; }
+.content.wide { display: block; }
+/* Center the reading column and picture column in wide windows. */
+.content:not(.wide) { justify-content: center; }
+/* Articles: the text wraps around the picture column, and its width is capped at 960px like Wikipedia's so long
+   lines stay readable; the article is centered when the window is wider. */
+.content.article { display: block; }
+.content.article .flow { max-width: calc(960px * var(--fs)); margin: 0 auto; }
+.content.article .flow::after { content: ""; display: block; clear: both; }
+.content.article .media { float: right; margin: 0 0 16px 24px; }
+.content.article .text { max-width: none; }
+.media { width: 260px; flex: none; }
+.media:empty { display: none; }
+.media .frame { padding: 4px; background: #fff; border: 1px solid #9fb0d0; box-shadow: 0 2px 6px rgba(0, 0, 0, .15); }
+.media .frame img { display: block; width: 100%; max-height: 320px; object-fit: cover; cursor: zoom-in; }
+.media .frame img.small { max-width: 100%; margin: 16px auto; object-fit: contain; }
+.media .cap { padding: 6px 2px 0; font: 11.5px/1.4 "Segoe UI"; color: #333; user-select: text; }
+.facts { margin-top: 12px; background: #fff; border: 1px solid #9fb0d0; font: 11.5px "Segoe UI"; color: #222; }
+.facts h6 { margin: 0; padding: 4px 8px; font: 600 12px "Segoe UI"; color: #fff; background: linear-gradient(var(--ink-2), var(--ink-1)); }
+.facts .r { display: flex; justify-content: space-between; gap: 10px; padding: 4px 8px; border-top: 1px solid #e3e8f3; user-select: text; }
+.facts .r span:first-child { flex: none; max-width: 45%; color: #555; }
+.facts .r span:last-child { text-align: right; }
+
+/* scrollbars in the period style */
+.content::-webkit-scrollbar, .rail .in::-webkit-scrollbar, .suggest::-webkit-scrollbar, .wx-cb::-webkit-scrollbar { width: 15px; }
+.content::-webkit-scrollbar-track { background: #e3e8f3; border-left: 1px solid #c9d3ea; }
+.content::-webkit-scrollbar-thumb { background: linear-gradient(90deg, var(--ink-3), var(--ink-2)); border: 2px solid #e3e8f3; }
+.rail .in::-webkit-scrollbar-track, .suggest::-webkit-scrollbar-track, .wx-cb::-webkit-scrollbar-track { background: transparent; }
+.rail .in::-webkit-scrollbar-thumb, .suggest::-webkit-scrollbar-thumb, .wx-cb::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .25); border: 4px solid transparent; background-clip: padding-box; }
+
+/* ---------- article typography ---------- */
+.text { flex: 1; min-width: 0; max-width: 960px; font: calc(16px * var(--fs))/1.65 var(--read-font); color: #1c1c1c; user-select: text; cursor: auto; }
+.text p { margin: 0 0 11px; }
+/* The large first letter sinks two lines into the paragraph. It isn't a float, so a picture floated just above the
+   paragraph (pushed down below the picture column) can't drag it down too. */
+.text .lede::first-letter { initial-letter: 2; margin-right: 7px; font-family: var(--read-font); font-weight: 400; color: var(--ink-2); }
+.text h2 { overflow: hidden; margin: 24px 0 6px; padding-bottom: 3px; font: 600 calc(21px * var(--fs)) "Segoe UI"; color: var(--ink-2); border-bottom: 1px solid #c9d3ea; }
+.text h3 { margin: 18px 0 4px; font: 600 calc(17px * var(--fs)) "Segoe UI"; color: #33507f; }
+.text h4 { margin: 14px 0 4px; font: 600 calc(15px * var(--fs)) "Segoe UI"; color: #33507f; }
+.text a { color: #1d47a8; text-decoration: none; border-bottom: 1px dotted rgba(29, 71, 168, .5); cursor: pointer; }
+.text a:hover { color: #c26a00; border-bottom-color: #c26a00; }
+.text figure { float: right; clear: right; max-width: 250px; margin: 4px 0 12px 18px; padding: 4px; background: #fff; border: 1px solid #c9d3ea; }
+.text figure a { border: 0; }
+.text figure img { display: block; max-width: 100%; height: auto; cursor: zoom-in; }
+/* Wikipedia's multiple-image boxes ({{Multiple image}}): one frame with a heading, several pictures, and captions */
+.text .tmulti { float: right; clear: right; max-width: 100%; margin: 4px 0 12px 18px; padding: 4px; background: #fff; border: 1px solid #c9d3ea; font: 11.5px/1.4 "Segoe UI"; color: #444; }
+.text .tmulti.floatleft, .text .tmulti.tleft { float: left; clear: left; margin: 4px 18px 12px 0; }
+.text .tmulti.tnone, .text .tmulti.center { float: none; width: fit-content; margin: 12px auto; }
+.text .tmulti .thumbinner { max-width: 100% !important; }
+.text .tmulti .trow { display: flex; justify-content: center; gap: 4px; }
+.text .tmulti .trow + .trow { margin-top: 6px; }
+.text .tmulti .theader { flex: 1; padding: 2px 0 4px; text-align: center; font-weight: 600; color: #222; }
+.text .tmulti .tsingle { max-width: 100%; }
+.text .tmulti .thumbimage img { display: block; max-width: 100%; height: auto; margin: 0 auto; cursor: zoom-in; }
+.text .tmulti .thumbcaption { padding-top: 3px; }
+/* Wikipedia's picture galleries: a row of framed pictures with captions */
+.text ul.gallery { clear: both; display: flex; flex-wrap: wrap; gap: 10px; max-width: none !important; margin: 12px 0; padding: 0; list-style: none; }
+.text ul.gallery li.gallerycaption { width: 100%; font: 600 13px "Segoe UI"; color: #33507f; }
+.text ul.gallery li.gallerybox { width: 190px !important; padding: 4px; background: #fff; border: 1px solid #c9d3ea; font: 11.5px/1.4 "Segoe UI"; color: #444; }
+.text ul.gallery li.gallerybox .thumb { width: auto !important; height: 140px !important; display: flex; align-items: center; justify-content: center; }
+.text ul.gallery li.gallerybox img { display: block; max-width: 100%; max-height: 140px; width: auto; height: auto; cursor: zoom-in; }
+.text ul.gallery .gallerytext { padding-top: 4px; }
+/* Videos and sounds in the article text */
+.vthumb { position: relative; display: block; min-width: 200px; min-height: 120px; padding: 0; border: 0; background: #0b0e16; cursor: pointer; }
+.text figure .vthumb img { cursor: pointer; }
+.vthumb .play { position: absolute; left: 50%; top: 50%; width: 50px; height: 50px; margin: -25px 0 0 -25px; display: grid; place-items: center; border-radius: 50%;
+  background: rgba(10, 20, 50, .72); border: 2px solid #fff; color: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, .5); transition: background .15s; }
+.vthumb .play .ic { width: 20px; height: 20px; margin-left: 3px; fill: currentColor; }
+.vthumb:hover .play { background: var(--ink-2); }
+.vthumb .dur { position: absolute; right: 6px; bottom: 6px; padding: 0 5px; border-radius: 2px; background: rgba(0, 0, 0, .7); font: 600 11px/18px "Segoe UI"; color: #fff; }
+.text .sounds { float: right; clear: right; width: 250px; margin: 4px 0 12px 18px; padding: 8px 10px; background: #fff; border: 1px solid #c9d3ea; font: 12px/1.4 "Segoe UI"; }
+.text .sounds h6 { margin: 0 0 6px; font: 600 12.5px "Segoe UI"; color: var(--ink-1); }
+.text .sounds .aud + .aud, .text .sounds .adesc + .aud { margin-top: 6px; }
+.text .sounds .adesc { margin: 3px 0 0; color: #555; font-size: 11.5px; }
+.aud { display: flex; align-items: center; gap: 10px; padding: 7px 9px; background: #f3f6fc; border: 1px solid #c9d3ea; font-family: "Segoe UI"; }
+.aud .pb { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--ink-2); color: #fff; cursor: pointer; }
+.aud .pb:hover { background: var(--ink-3); }
+.aud .pb .ic { width: 12px; height: 12px; fill: currentColor; }
+.aud .info { flex: 1; min-width: 0; }
+.aud .info b { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 600 12px "Segoe UI"; color: #222; }
+.aud .bar { position: relative; height: 12px; cursor: pointer; touch-action: none; }
+.aud .bar::before { content: ""; position: absolute; left: 0; right: 0; top: 4px; height: 4px; border-radius: 2px; background: #c9d3ea; }
+.aud .bar i { position: absolute; left: 0; top: 4px; height: 4px; border-radius: 2px; background: var(--orange); }
+.aud .tm { display: flex; justify-content: space-between; font-size: 10.5px; color: #666; font-variant-numeric: tabular-nums; }
+.aud.err .pb { background: #9aa3b5; cursor: default; }
+.text figcaption { padding-top: 4px; font: 11.5px/1.4 "Segoe UI"; color: #444; }
+.text img { max-width: 100%; height: auto; }
+.text table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; margin: 12px 0; font: 12.5px/1.4 "Segoe UI"; }
+.text th, .text td { padding: 3px 7px; border: 1px solid #c9d3ea; vertical-align: top; }
+/* A second fact box (the first becomes Quick facts), or a "Part of a series" box, sits to the right of the text, as on
+   Wikipedia, below Quick facts, instead of across the top of the article. */
+.text table.infobox, .text table.sidebar { display: table; float: right; clear: right; width: 260px; max-width: 45%; margin: 4px 0 14px 24px; font-size: 11.5px; }
+.text table.infobox caption, .text table.sidebar caption { padding-bottom: 4px; font-weight: 600; }
+.text table.infobox .infobox-image, .text table.infobox .infobox-full-data, .text table.infobox .infobox-below, .text table.sidebar .sidebar-image { text-align: center; }
+.text table.infobox .infobox-image img, .text table.infobox .infobox-full-data img, .text table.sidebar .sidebar-image img { display: inline-block; }
+.text th { background: #e6ecf7; }
+/* Railway route diagrams ("routemap"): a grid of 20 px track pieces that must touch, so none of the article table look.
+   Wikipedia styles them with TemplateStyles, which articles here don't load; these are the rules that matter. */
+.text table.routemap { display: table; margin: 0 auto; border: 0; border-collapse: collapse; white-space: nowrap; line-height: 1.2; font: 12.5px/1.2 "Segoe UI"; }
+.text table.routemap > tbody > tr { line-height: 1; }
+.text table.routemap td, .text table.routemap th, .text table.RMcollapse td, .text table.RMreplace td { padding: 0; border: 0; width: auto; vertical-align: middle; text-align: center; background: none; }
+.text table.routemap .RMcollapse, .text table.routemap .RMreplace { display: table; margin: 0; border-collapse: collapse; vertical-align: middle; }
+.text table.routemap .RMreplace { position: absolute; bottom: 0; }
+.text table.routemap .RMl1 { padding: 0 3px; text-align: left; }
+.text table.routemap .RMr1 { padding: 0 3px; text-align: right; }
+.text table.routemap .RMl { text-align: right; }
+.text table.routemap .RMr { text-align: left; }
+.text table.routemap .RMl4 { padding: 0 3px 0 0; text-align: left; }
+.text table.routemap .RMr4 { padding: 0 0 0 3px; text-align: right; }
+.text table.routemap .RMsi { display: inline; font-size: 90%; }
+.text .RMir > div { display: inline-block; vertical-align: middle; padding: 0; height: 20px; min-height: 20px; }
+.text .RMir img { height: initial !important; max-width: initial !important; margin: 0; border: 0; box-shadow: none; background: none; }
+.text .RMir .RMtx { line-height: 20px; height: 20px; min-height: 20px; vertical-align: middle; text-align: center; }
+.text .RMir .RMov { position: relative; z-index: 1; }
+.text .RMir .RMov .RMic, .text .RMir .RMov .RMtx { position: absolute; left: 0; top: 0; padding: 0; }
+.text .RMir .RMf_ { height: 5px; min-height: 5px; width: 20px; min-width: 20px; }
+.text .RMir .RMo { width: 2.5px; min-width: 2.5px; } .text .RMir .RMc { width: 5px; min-width: 5px; } .text .RMir .RMd { width: 10px; min-width: 10px; }
+.text .RMir .RM_ { width: 20px; min-width: 20px; } .text .RMir .RMb { width: 40px; min-width: 40px; } .text .RMir .RMs { width: 80px; min-width: 80px; }
+.text .RMsplit { display: inline-table; vertical-align: middle; margin: -3px 0; width: initial; }
+.text .RMbox, .text .RMinline { display: table; }
+.text .hatnote, .text [role="note"] { margin: 0 0 10px; padding-left: 16px; font: italic 12.5px "Segoe UI"; color: #555; }
+.text blockquote { margin: 12px 0; padding: 2px 14px; border-left: 3px solid var(--orange); color: #333; }
+.text ul, .text ol { padding-left: 24px; margin: 0 0 11px; }
+.text li { margin-bottom: 3px; }
+.text ul.gallery { display: flex; flex-wrap: wrap; gap: 10px; padding: 0; list-style: none; }
+.text ul.gallery li { width: 160px; font: 11.5px "Segoe UI"; }
+.text .attrib { clear: both; margin-top: 28px; padding-top: 8px; border-top: 1px solid #c9d3ea; font: 11.5px/1.5 "Segoe UI"; color: #666; }
+.text .attrib a { font-weight: 600; }
+
+.loading { padding: 30px 0; font: 13px "Segoe UI"; color: #4a5a7a; }
+.loading::before { content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 10px; vertical-align: -2px; border-radius: 50%;
+                   border: 2px solid #c9d3ea; border-top-color: var(--orange); animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.errbox { max-width: 520px; margin: 30px 0; padding: 16px 18px; background: #fff; border: 1px solid #c9d3ea; border-left: 4px solid var(--orange);
+          font: 13px/1.5 "Segoe UI"; color: #333; }
+.errbox b { display: block; margin-bottom: 4px; font-size: 15px; color: var(--ink-2); }
+.errbox .bbtn { margin-top: 10px; background: var(--ink-2); }
+.errbox .bbtn + .bbtn { margin-left: 8px; }
+
+/* explore cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+.card { padding: 0; text-align: left; background: #fff; border: 1px solid #c9d3ea; box-shadow: 0 1px 3px rgba(0, 0, 0, .08); transition: transform .12s, border-color .12s; }
+.card:hover { transform: translateY(-2px); border-color: var(--orange); }
+.card .ph { height: 120px; background: linear-gradient(135deg, var(--ink-3), var(--ink-1)) center/cover; }
+.card .b { padding: 9px 11px 12px; }
+.card .b b { display: block; font: 600 14px "Segoe UI"; color: var(--ink-2); }
+.card .b span { display: block; margin-bottom: 4px; font: 11.5px "Segoe UI"; color: #777; }
+.card .b p { margin: 0; font: 12.5px/1.45 var(--read-font); color: #333; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.card.ghost { height: 250px; background: linear-gradient(90deg, #eef2f9, #f8fafd, #eef2f9); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* timeline */
+.tl { max-width: 860px; }
+.tl-item { display: flex; gap: 16px; width: 100%; padding: 12px 6px; background: none; border: 0; border-bottom: 1px solid #e3e8f3; text-align: left; }
+.tl-item:hover { background: #f1f5fc; }
+.tl-item.nolink { cursor: default; }
+.tl-item.nolink:hover { background: none; }
+.tl-item.nolink .yr { color: #e7a85a; }
+.tl-item.nolink .tx { color: #666; }
+.tl-item .yr { flex: none; width: 70px; text-align: right; font: 300 26px/1.1 "Segoe UI"; color: var(--orange); }
+.tl-item .tx { flex: 1; font: calc(14.5px * var(--fs))/1.5 var(--read-font); color: #222; }
+.tl-item .tx small { display: block; margin-top: 3px; font: 11.5px "Segoe UI"; color: #1d47a8; }
+.tl-item .th { flex: none; width: 70px; height: 70px; background: #dfe6f3 center/cover; border: 1px solid #c9d3ea; }
+
+/* gallery */
+.potd { max-width: 980px; }
+.content.wide .text { max-width: none; }
+.potd figure { float: none; max-width: none; margin: 0; padding: 6px; background: #fff; border: 1px solid #c9d3ea; box-shadow: 0 2px 8px rgba(0, 0, 0, .12); }
+.potd figure img { display: block; max-width: 100%; max-height: 52vh; margin: 0 auto; cursor: zoom-in; }
+.potd .desc { margin: 12px 0 4px; font: calc(14.5px * var(--fs))/1.55 var(--read-font); color: #222; user-select: text; }
+.potd .credit { font: 11.5px "Segoe UI"; color: #666; user-select: text; }
+.potd .credit .bbtn { margin-left: 8px; background: var(--ink-2); vertical-align: middle; }
+.strip { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.strip button { width: 120px; padding: 3px; background: #fff; border: 1px solid #c9d3ea; text-align: center; font: 11px "Segoe UI"; color: #555; }
+.strip button:hover, .strip button.on { border-color: var(--orange); color: #000; }
+.strip button i { position: relative; display: block; height: 80px; margin-bottom: 3px; background: #dfe6f3 center/cover; }
+.strip button:disabled { opacity: .5; cursor: default; }
+.strip button:disabled:hover { border-color: #c9d3ea; color: #555; }
+.strip button i.audio { background: linear-gradient(135deg, #2a4f96, #12285a); }
+.strip button i b { position: absolute; left: 3px; bottom: 3px; padding: 0 4px; border-radius: 2px; background: rgba(0, 0, 0, .7); font: 600 10px/16px "Segoe UI"; font-style: normal; color: #fff; }
+.rail .lnk:disabled { opacity: .45; cursor: default; }
+/* The Media page's Picture / Video / Sound tabs */
+.mtabs { display: flex; border: 1px solid rgba(255, 255, 255, .35); border-radius: 3px; overflow: hidden; }
+.mtabs button { display: flex; align-items: center; gap: 6px; padding: 5px 14px; border: 0; border-right: 1px solid rgba(255, 255, 255, .25); background: rgba(0, 0, 0, .25);
+  font: 600 12px "Segoe UI"; color: #e6eefc; cursor: pointer; }
+.mtabs button:last-child { border-right: 0; }
+.mtabs button:hover { background: rgba(255, 255, 255, .12); }
+.mtabs button .ic { width: 13px; height: 13px; fill: currentColor; }
+.mtabs button.on { background: var(--ink-0); color: var(--orange); box-shadow: inset 0 -2px var(--orange); cursor: default; }
+/* Media of the Day and Featured Sounds play on the page, with the viewer's controls. */
+.mviewer.inline { width: auto; max-height: none; box-shadow: 0 2px 8px rgba(0, 0, 0, .12); }
+.mviewer.inline .mstage { max-height: 58vh; }
+.sotd .mstage { aspect-ratio: auto; height: 240px; }
+.potd .eyebrow { margin-bottom: 6px; font: 600 11px "Segoe UI"; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-2); }
+.mlist-h { margin: 24px 0 8px; font: 600 calc(17px * var(--fs)) "Segoe UI"; color: #33507f; }
+.mlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 8px; max-width: 980px; }
+
+/* search results */
+.results { max-width: 860px; }
+.dym { max-width: 860px; margin: 0 0 14px; font: 15px "Segoe UI"; color: #333; }
+.dym button { padding: 0; border: 0; border-bottom: 1px dotted rgba(29, 71, 168, .5); background: none; font: italic 600 15px "Segoe UI"; color: #1d47a8; cursor: pointer; }
+.dym button:hover { color: #c26a00; border-bottom-color: #c26a00; }
+.res { display: flex; gap: 14px; width: 100%; padding: 12px 6px; background: none; border: 0; border-bottom: 1px solid #e3e8f3; text-align: left; }
+.res:hover { background: #f1f5fc; }
+.res .th { flex: none; width: 64px; height: 64px; background: #dfe6f3 center/cover; border: 1px solid #c9d3ea; }
+/* a result with no free picture: an icon for the kind of subject (kinds.js) */
+.res .th.ph { display: grid; place-items: center; background: linear-gradient(160deg, #eef2f9, #dbe3f1); color: #7b8db3; }
+.res .th.ph svg { width: 34px; height: 34px; fill: currentColor; }
+.res b { display: block; font: 600 15px "Segoe UI"; color: var(--ink-2); }
+.res span { display: block; font: 11.5px "Segoe UI"; color: #777; }
+.res p { margin: 3px 0 0; font: 13px/1.5 var(--read-font); color: #333; }
+.res p strong { background: #fff1cf; font-weight: 600; }
+
+/* ---------- overlays ---------- */
+.overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .45); animation: viewin .15s ease-out; }
+.dialog { width: 400px; background: linear-gradient(var(--ink-2), var(--ink-0)); border: 1px solid var(--ink-3); box-shadow: 0 12px 40px rgba(0, 0, 0, .6); }
+.dialog .dt { height: 26px; display: flex; align-items: center; gap: 7px; padding: 0 8px; background: linear-gradient(#2a2a2a, #0d0d0d); font-size: 12px; color: #ddd; user-select: none; }
+.dialog .dt img { width: 16px; height: 16px; }
+.dialog .db { display: flex; gap: 14px; padding: 18px 18px 8px; font: 13px/1.5 "Segoe UI"; color: #e6eefc; }
+.dialog .db > img { width: 60px; height: 60px; flex: none; filter: drop-shadow(0 0 10px rgba(190, 215, 255, .5)); }
+.dialog .db h2 { margin: 0 0 4px; font: 600 17px "Segoe UI"; color: var(--orange); }
+.dialog .db p { margin: 0 0 8px; }
+.dialog .db p.cmd { display: flex; align-items: center; gap: 8px; }
+.dialog .db p.cmd code { flex: 1; min-width: 0; padding: 5px 7px; overflow-wrap: anywhere; background: rgba(0, 0, 0, .35); border: 1px solid var(--ink-3); font: 11.5px Consolas, "DejaVu Sans Mono", monospace; color: #fff; user-select: all; }
+.dialog .db p.support { margin-top: 4px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, .2); }
+.dialog .df { display: flex; justify-content: flex-end; gap: 8px; padding: 8px 14px 14px; }
+.dialog .df .go { min-width: 80px; }
+.lightbox { flex-direction: column; background: rgba(4, 10, 26, .88); cursor: zoom-out; }
+.lightbox img { max-width: 88vw; max-height: 78vh; border: 6px solid #fff; box-shadow: 0 10px 40px rgba(0, 0, 0, .7); }
+.lightbox div { max-width: 70vw; margin-top: 10px; text-align: center; font: 13px "Segoe UI"; color: #e6eefc; }
+
+/* Read Aloud's choice of reader, and the recorded narration bar */
+.rmenu { position: fixed; z-index: 60; width: 300px; padding: 4px; background: #16181d; border: 1px solid var(--bar-edge); box-shadow: 0 8px 24px rgba(0, 0, 0, .5); }
+.rmenu .ri { width: 100%; display: flex; gap: 10px; padding: 8px 10px; border: 0; border-radius: 2px; background: none; text-align: left; font: 13px "Segoe UI"; color: #e8e8e8; cursor: pointer; }
+.rmenu .ri:hover, .rmenu .ri:focus-visible { background: var(--ink-2); outline: none; }
+.rmenu .rio { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, .1); color: var(--orange); }
+.rmenu .rio .ic { width: 15px; height: 15px; fill: currentColor; }
+.rmenu .ri b { display: block; font-weight: 600; }
+.rmenu .ri .s { display: block; margin-top: 2px; font-size: 11.5px; line-height: 1.35; color: #9aa6bd; }
+.nbar { flex: none; display: flex; align-items: center; gap: 12px; padding: 8px 24px; background: linear-gradient(var(--ink-1), var(--ink-0)); box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+  font: 12px "Segoe UI"; color: #cfd6e2; font-variant-numeric: tabular-nums; position: relative; z-index: 1; }
+.nbar .ic { fill: currentColor; }
+.nbar .pb { width: 30px; height: 30px; flex: none; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--orange); color: #141a2e; cursor: pointer; }
+.nbar .pb .ic { width: 13px; height: 13px; }
+.nbar .who { flex: none; max-width: 300px; min-width: 0; }
+.nbar .who b { display: block; font-weight: 600; color: #fff; white-space: nowrap; }
+.nbar .who b span { font-weight: 400; color: #aac0e6; }
+.nbar .who > span { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 11px; color: #aac0e6; }
+.nbar .bar { position: relative; flex: 1; height: 14px; cursor: pointer; touch-action: none; }
+.nbar .bar::before { content: ""; position: absolute; left: 0; right: 0; top: 5px; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, .2); }
+.nbar .bar i { position: absolute; left: 0; top: 5px; height: 4px; border-radius: 2px; background: var(--orange); }
+.nbar .x { flex: none; padding: 2px 6px; background: none; border: 0; font-size: 13px; color: #cfd6e2; cursor: pointer; }
+.nbar .x:hover { color: #fff; }
+
+/* The media viewer */
+.mviewer .ic { fill: currentColor; }
+.mview { background: rgba(0, 0, 0, .82); }
+.mviewer { width: min(900px, 92vw); max-height: 96vh; display: flex; flex-direction: column; background: #0b0e16; border: 1px solid #3a4050; box-shadow: 0 12px 40px rgba(0, 0, 0, .6); }
+.mviewer > * { flex: none; }
+.mviewer .dt { height: 28px; display: flex; align-items: center; gap: 10px; padding: 0 0 0 10px; background: linear-gradient(#2a2a2a, #0d0d0d); font-size: 12px; color: #ddd; user-select: none; }
+.mviewer .dt .vt { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mviewer .dt .pos { color: #8a93a6; }
+.mviewer .dt .x { width: 40px; height: 28px; background: none; border: 0; color: #ddd; font-size: 12px; cursor: pointer; }
+.mviewer .dt .x:hover { background: #c42b1c; color: #fff; }
+.stagewrap { position: relative; }
+.mstage { position: relative; width: 100%; aspect-ratio: 16 / 9; max-height: 62vh; overflow: hidden; background: #000; }
+.mstage img, .mstage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.mstage.audio { background: radial-gradient(ellipse at 50% 45%, #2a4f96, #0b1838 75%); }
+.mstage.audio .wave { position: absolute; left: 14%; right: 14%; top: 26%; height: 30%; display: flex; align-items: center; gap: 4px; }
+.mstage.audio .lbl { position: absolute; left: 8%; right: 8%; bottom: 16%; text-align: center; font: 600 18px "Segoe UI"; color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, .6); }
+@keyframes wave { to { transform: scaleY(.4); } }
+.mstage.audio.playing .wave i { animation: wave .55s ease-in-out infinite alternate; }
+.mstage.audio.playing .wave i:nth-child(3n) { animation-duration: .4s; }
+.mstage.audio.playing .wave i:nth-child(4n + 1) { animation-duration: .75s; }
+.mstage .big { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; display: grid; place-items: center; border-radius: 50%;
+  background: rgba(10, 20, 50, .72); border: 2px solid #fff; color: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, .5); cursor: pointer; }
+.mstage .big .ic { width: 24px; height: 24px; margin-left: 4px; }
+.mstage .big:hover { background: rgba(20, 40, 90, .85); }
+.mstage.playing .big { display: none; }
+.mstage .merr { position: absolute; left: 0; right: 0; bottom: 14px; text-align: center; font-size: 13px; color: #ffb4a8; }
+.stagewrap .nav { position: absolute; top: 50%; width: 40px; height: 64px; margin-top: -32px; background: rgba(0, 0, 0, .5); border: 0; color: #fff; font-size: 34px; line-height: 1; cursor: pointer; opacity: 0; transition: opacity .15s; }
+.stagewrap:hover .nav { opacity: 1; }
+.stagewrap .nav.prev { left: 0; }
+.stagewrap .nav.next { right: 0; }
+.mviewer .ctl { display: flex; align-items: center; gap: 12px; padding: 10px 14px; font-size: 12px; color: #cfd6e2; font-variant-numeric: tabular-nums; }
+.mviewer .ctl[hidden] { display: none; }
+.mviewer .pb { width: 30px; height: 30px; flex: none; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--orange); color: #141a2e; cursor: pointer; }
+.mviewer .pb .ic { width: 13px; height: 13px; }
+.mviewer .bar { position: relative; flex: 1; height: 14px; cursor: pointer; touch-action: none; }
+.mviewer .bar::before { content: ""; position: absolute; left: 0; right: 0; top: 5px; height: 4px; border-radius: 2px; background: #3a4050; }
+.mviewer .bar i { position: absolute; left: 0; top: 5px; height: 4px; border-radius: 2px; background: var(--orange); }
+.mviewer .vb { padding: 4px; background: none; border: 0; color: #cfd6e2; cursor: pointer; }
+.mviewer .vb .ic { width: 16px; height: 16px; }
+.mviewer .vr { width: 90px; height: 16px; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
+.mviewer .vr::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--orange) var(--p, 100%), #3a4050 var(--p, 100%)); }
+.mviewer .vr.muted::-webkit-slider-runnable-track { background: linear-gradient(90deg, #6b7385 var(--p, 100%), #3a4050 var(--p, 100%)); }
+.mviewer .vr::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; margin-top: -4px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .5); }
+.mviewer .vr:focus { outline: none; }
+.mviewer .vr:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--orange); }
+.mviewer .ctl .vb { margin-right: -6px; }
+.mviewer .credit { min-height: 14px; padding: 0 14px 12px; font-size: 11.5px; color: #8a93a6; }
+.mviewer .ctl[hidden] + .credit { padding-top: 10px; }
+.mstrip { display: flex; gap: 6px; padding: 0 14px 14px; overflow-x: auto; }
+.mstrip .mt { flex: none; width: 86px; aspect-ratio: 16 / 10; }
+.mstrip .mt .wave { top: 20px; height: 10px; }
+.mstrip .mt .lbl { -webkit-line-clamp: 1; }
+.mstrip .mt.on { border: 2px solid var(--orange); }
+.mstrip::-webkit-scrollbar { height: 10px; }
+.mstrip::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .25); border: 3px solid transparent; background-clip: padding-box; }
+
+/* ---------- print ---------- */
+@media print {
+  html, body, #app, .mstage, #view { height: auto; overflow: visible; background: #fff; }
+  .titlebar, .menubar, .toolbar, .crumbs, .fpane, .statusbar, .rail, .band .tools, .band > svg, .overlay, .strip, .bbtn { display: none !important; }
+  .page, .content { position: static; display: block; overflow: visible; padding: 0; background: #fff; }
+  .band { height: auto; margin-bottom: 14px; padding-bottom: 8px; background: none; color: #000; border-bottom: 2px solid #25458a; }
+  .band .t { position: static; }
+  .band small { color: #b86a08; }
+  .band h1 { color: #000; text-shadow: none; white-space: normal; font-size: 30px; }
+  .band .pron { display: none; }
+  .band .desc { color: #444; white-space: normal; }
+  /* Some themes give the title band's text a glow (Library); on white paper it would only blur. */
+  .band .t, .band .t * { text-shadow: none !important; }
+  .text { max-width: none; font-size: 11.5pt; }
+  .text a { color: #000; border-bottom: 0; }
+  .text h2, .text h3 { break-after: avoid; }
+  .text figure, .text table, .text blockquote { break-inside: avoid; }
+  /* The lead picture and quick facts sit in a narrow column beside the article. */
+  .content:not(.wide) { display: flex; align-items: flex-start; gap: 20px; }
+  .content.article { display: block; }
+  .content.article .flow { max-width: none; }
+  .content.article .media { margin: 0 0 12px 18px; }
+  .media { position: static; width: 190px; flex: none; }
+  .text table.infobox, .text table.sidebar { width: 190px; margin-left: 18px; }
+  .media .frame img { max-height: 240px; cursor: auto; }
+  .facts h6 { color: #000; background: none; border-bottom: 1px solid #9fb0d0; }
+  .tl-item, .res { break-inside: avoid; }
+  .card { break-inside: avoid; }
+  /* "Include pictures" turned off in Print Preview. */
+  .print-noimg img, .print-noimg figure, .print-noimg .frame, .print-noimg .media .cap, .print-noimg .th, .print-noimg .card .ph { display: none !important; }
+}
+
+/* ---------- Options dialog ---------- */
+.dialog.options { width: 540px; }
+.dialog.whatsnew { width: 440px; }
+.wn { margin: 4px 0 6px; padding: 0; list-style: none; }
+.wn li { position: relative; margin: 0 0 9px; padding-left: 16px; }
+.wn li::before { content: "\25C6"; position: absolute; left: 0; color: var(--orange); }
+.wn b { display: block; color: #fff; }
+.options .otabs { display: flex; gap: 2px; padding: 10px 12px 0; border-bottom: 1px solid var(--ink-3); }
+.options .otab { padding: 6px 16px; margin-bottom: -1px; border: 1px solid transparent; border-bottom: 0; background: none; color: var(--sky); font: 600 12px "Segoe UI"; }
+.options .otab:hover { color: #fff; }
+.options .otab.on { color: #fff; background: rgba(var(--deep), .45); border-color: var(--ink-3); border-top: 2px solid var(--orange); }
+.options .obody { height: 380px; overflow: auto; padding: 12px 16px 4px; background: rgba(var(--deep), .45); }
+.options .ocols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.options .ogroup { margin: 0 0 12px; padding: 6px 12px 10px; border: 1px solid rgba(var(--edge), .25); }
+.options .ogroup legend { padding: 0 6px; font: 600 11px "Segoe UI"; letter-spacing: 1.5px; text-transform: uppercase; color: var(--orange); }
+.options .ocheck { position: relative; display: flex; gap: 10px; align-items: flex-start; padding: 5px 0; color: #fff; font: 13px "Segoe UI"; }
+.options .ocheck input, .options .oradio input { position: absolute; opacity: 0; pointer-events: none; }
+.options .ocheck .box { flex: none; width: 14px; height: 14px; margin-top: 2px; border: 1px solid #8a93a6; background: #0a0c10; }
+.options .ocheck input:checked + .box { border-color: var(--orange); background: var(--orange) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3 7.5l2.6 2.6L11 4.5' fill='none' stroke='%232b1d00' stroke-width='2'/%3E%3C/svg%3E") center/12px no-repeat; }
+.options .ocheck input:focus-visible + .box, .options .oradio input:focus-visible + .dot { outline: 1px solid var(--orange); outline-offset: 2px; }
+.options .ocheck b { display: block; font-weight: 600; }
+.options .ocheck small { display: block; font-size: 11.5px; color: var(--sky); }
+.options .ocheck.off { opacity: .45; }
+.options .oradios { display: grid; gap: 2px; padding-top: 2px; }
+.options .oradio { position: relative; display: flex; align-items: center; gap: 9px; padding: 3px 0; font: 13px "Segoe UI"; color: #fff; }
+.options .oradio .dot { flex: none; width: 13px; height: 13px; border-radius: 50%; border: 1px solid #8a93a6; background: #0a0c10; }
+.options .oradio input:checked + .dot { border-color: var(--orange); box-shadow: inset 0 0 0 3px #0a0c10; background: var(--orange); }
+.options .orow { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
+.options .orow.top { align-items: flex-start; }
+.options .orow.end { justify-content: flex-end; }
+.options .olabel { width: 64px; flex: none; font: 13px "Segoe UI"; color: #cfdcf5; }
+.options .oval { width: 52px; text-align: right; font: 11px Consolas, monospace; color: #cfd6e2; }
+.options .onote { margin: 2px 0 6px; font: 12px/1.45 "Segoe UI"; color: var(--sky); }
+.options .oselect { flex: 1; height: 24px; padding: 0 6px; background: #0a0c10; color: #fff; border: 1px solid var(--bar-edge); font: 12px "Segoe UI"; }
+.options .oselect:focus { outline: none; border-color: var(--orange); }
+.options .oslider { flex: 1; height: 16px; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; }
+.options .oslider::-webkit-slider-runnable-track { height: 4px; border: 1px solid var(--bar-edge); background: linear-gradient(90deg, var(--orange) var(--p, 50%), #0a0c10 var(--p, 50%)); }
+.options .oslider.muted::-webkit-slider-runnable-track { background: linear-gradient(90deg, #4a5262 var(--p, 50%), #0a0c10 var(--p, 50%)); }
+.options .oslider::-webkit-slider-thumb { -webkit-appearance: none; width: 9px; height: 16px; margin-top: -7px; background: linear-gradient(#e8ecf2, #9aa3b5); border: 1px solid #000; }
+.options .oslider:focus { outline: none; }
+.options .osample { margin: 8px 0 2px; padding: 10px 12px; background: #fbfcfe; color: #1c1c1c; border: 1px solid #9fb0d0; font-family: Georgia, "Times New Roman", serif; line-height: 1.6; }
+.options .osample[data-font="sans"] { font-family: "Segoe UI", Tahoma, sans-serif; }
+.options .df .go:disabled { opacity: .45; }
+
+/* ---------- Offline Library (library-ui.js) ---------- */
+.dialog.offline { width: 600px; max-height: calc(100vh - 40px); display: flex; flex-direction: column; }
+.offline .ob { padding: 14px 18px 6px; overflow: auto; font: 13px/1.45 "Segoe UI"; color: #e6eefc; }
+.offline .intro { margin: 0 0 12px; color: #cfdcf5; }
+.offline .status { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 9px 12px; background: rgba(0, 0, 0, .28); border: 1px solid var(--ink-3); }
+.offline .status b { color: #fff; }
+.offline .status .upd { color: var(--gold, #ffd27a); }
+.offline .dotc { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.offline .packs { display: grid; gap: 8px; }
+/* Every pack box is the same height: the title and description sit centered, and move up to make room for a red
+   reason line instead of the box growing. A pack that's downloading grows to show its progress. */
+.offline .pack { display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; align-items: center; align-content: center; height: 78px; padding: 8px 12px;
+  background: rgba(255, 255, 255, .035); border: 1px solid var(--ink-3); }
+.offline .pack.dl { height: auto; padding: 10px 12px; }
+.offline .pack.rec { border-color: rgba(245, 166, 35, .6); background: rgba(245, 166, 35, .06); }
+.offline .pack .txt { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.offline .pack h3 { margin: 0; display: flex; align-items: center; gap: 8px; height: 18px; font: 600 14px/18px "Segoe UI"; color: #fff; }
+.offline .pack .tag { padding: 0 6px; line-height: 16px; font: 600 10px "Segoe UI"; letter-spacing: 1px; color: #1a1406; background: var(--orange); }
+.offline .pack .tag.ok { background: #5fbf6a; color: #08200b; }
+.offline .pack .tag.inc { background: none; color: #9fe0a8; border: 1px solid rgba(95, 191, 106, .6); }
+.offline .pack p { margin: 0; font-size: 12px; line-height: 16px; color: #b9c6e0; }
+.offline .pack.off h3, .offline .pack.off p:not(.why), .offline .pack.off .size { opacity: .5; }
+.offline .pack p.why { margin: 0; font-size: 12px; line-height: 16px; color: #ff9d8f; }
+.offline .pack .acts { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.offline .pack .size { min-height: 17px; font: 600 13px/17px "Segoe UI"; color: #fff; }
+.offline .bar { grid-column: 1 / -1; height: 8px; margin-top: 6px; background: rgba(0, 0, 0, .45); border: 1px solid rgba(160, 190, 255, .3); }
+.offline .bar i { display: block; height: 100%; background: linear-gradient(90deg, #c97a10, #f5a623, #ffe0a0); box-shadow: 0 0 8px #f5a623; transition: width .4s; }
+.offline .prog { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 10px; font-size: 11.5px; color: #b9c6e0; }
+.offline .oerr { margin: 10px 0 0; padding: 8px 12px; border-left: 3px solid #e0604a; background: rgba(224, 96, 74, .12); font-size: 12.5px; color: #ffd8cf; }
+.offline .where { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 12px; color: #b9c6e0; }
+.offline .where code { flex: 1; min-width: 0; padding: 4px 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: rgba(0, 0, 0, .35); border: 1px solid var(--ink-3); font: 11.5px Consolas, "DejaVu Sans Mono", monospace; color: #fff; }
+.offline .wherenote { margin: 4px 0 0; font-size: 11.5px; color: #b9c6e0; opacity: .8; }
+.offline .tag.miss { background: #e8a33a; color: #1a1200; }
+.offline .opts { margin-top: 10px; display: grid; gap: 4px; }
+.offline .opt { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; color: #dbe5f7; }
+.offline .opt input { margin-top: 3px; accent-color: var(--orange); }
+.offline .subopts { display: grid; gap: 3px; margin: 2px 0 0 24px; }
+.offline .subopts.off { opacity: .45; }
+.offline .opt.sub { font-size: 12px; color: #cfdcf5; }
+.offline .kiwix { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 9px 12px; background: rgba(0, 0, 0, .22); border-left: 3px solid var(--orange); font-size: 12px; color: #cfdcf5; }
+.offline .kiwix b { color: #fff; }
+.offline .kiwix .go { flex: none; }
+.offline .fine { margin: 8px 0 0; font-size: 11px; color: #8f9dbd; }
+.offline .go.primary, .dialog .go.default.primary { background: linear-gradient(#ffc14d, #f5a623 55%, #d4860f); border-color: #b06f0c; color: #1a1406; font-weight: 600; }
+.offline .go.quiet { font-weight: 400; color: #cfdcf5; }
+.offline .linkbtn { justify-self: start; padding: 2px 0; background: none; border: 0; color: #9fc4ff; font: 12px "Segoe UI"; text-decoration: underline; cursor: pointer; }
+.offline .linkbtn:hover { color: #fff; }
+.offline .go:disabled { opacity: .5; cursor: default; }
+.offline .go.primary:disabled { background: linear-gradient(#2b303a, #1b1e25); border-color: #4a5262; color: #8f9dbd; }

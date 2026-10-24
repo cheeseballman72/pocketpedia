@@ -1,0 +1,6 @@
+/* Startup screen for portrait phones: the 640x400 art fills the screen, and the pieces are placed in percentages. */
+html, body { height: 100%; margin: 0; overflow: hidden; background: #0b1a40; }
+.emblem { left: 50%; margin-left: -48px; top: calc(37.5% - 48px); }
+.title { top: 51.5%; }
+.load { left: 12%; right: 12%; bottom: calc(56px + env(safe-area-inset-bottom, 0px)); }
+.foot { flex-direction: column; align-items: center; gap: 4px; text-align: center; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }

@@ -1,0 +1,73 @@
+﻿html, body { margin: 0; height: 100%; overflow: hidden; background: #0f2250; }
+body { position: relative; font-family: "Segoe UI", Tahoma, sans-serif; color: #fff; user-select: none; cursor: default;
+       transition: opacity .45s ease; }
+body.out { opacity: 0; }
+/* Animations turned off in Options: show the finished splash screen without motion. */
+body.no-anim *, body.no-anim { animation: none !important; transition: none !important; }
+body.no-anim .bar i { width: 100%; }
+body.no-anim .spark { opacity: 0; }
+
+svg.bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.spin { transform-origin: 0 0; animation: spin 9s linear both; }
+.petal { transform-origin: 0 0; animation: grow 1.9s cubic-bezier(.16, .84, .3, 1) both; }
+.core { transform-box: view-box; transform-origin: 320px 150px; animation: core 2.6s ease-out .35s both; }
+.arcs { animation: fade 2s ease-out .8s both; }
+.spark { transform-origin: 0 0; animation: spark 1.5s ease-out 2.05s both; }
+
+@keyframes spin { from { transform: rotate(-14deg); } to { transform: rotate(16deg); } }
+@keyframes grow { from { transform: scale(.05) rotate(-40deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+@keyframes core { 0% { opacity: 0; transform: scale(.2); } 55% { opacity: 1; transform: scale(1.3); } 100% { opacity: .85; transform: scale(1); } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes spark { 0% { opacity: 0; transform: scale(.2) rotate(0); } 35% { opacity: .95; transform: scale(1.15) rotate(20deg); } 100% { opacity: 0; transform: scale(.5) rotate(50deg); } }
+
+.emblem { position: absolute; left: 272px; top: 98px; width: 96px; height: 96px;
+          filter: drop-shadow(0 0 14px rgba(190, 215, 255, .85)); animation: emblem 1.2s cubic-bezier(.2, .8, .2, 1.2) 1.1s both; }
+@keyframes emblem { from { opacity: 0; transform: translateY(16px) scale(.6); } to { opacity: 1; transform: none; } }
+
+.title { position: absolute; left: 0; right: 0; top: 206px; text-align: center; text-shadow: 0 2px 12px rgba(5, 15, 45, .85); }
+.title .e { font: 300 24px "Segoe UI"; letter-spacing: 1px; animation: rise .9s ease-out 1.6s both; }
+.title .y { font: 600 66px/1 "Segoe UI"; letter-spacing: 4px; animation: track 1.7s cubic-bezier(.2, .8, .2, 1) 1.8s both; }
+.title .tag { margin-top: 8px; font: 600 10px "Segoe UI"; letter-spacing: 5px; color: #aac0e6; animation: rise .9s ease-out 2.5s both; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes track { from { opacity: 0; letter-spacing: 30px; } to { opacity: 1; letter-spacing: 4px; } }
+
+.load { position: absolute; left: 160px; right: 160px; bottom: 34px; animation: rise .6s ease-out .4s both; }
+.status { height: 15px; margin-bottom: 6px; text-align: center; font: 11px "Segoe UI"; color: #cfdcf5; }
+.bar { height: 4px; background: rgba(0, 0, 0, .45); border: 1px solid rgba(160, 190, 255, .3); }
+.bar i { display: block; width: 0; height: 100%; background: linear-gradient(90deg, #c97a10, #f5a623, #ffe0a0);
+         box-shadow: 0 0 8px #f5a623; animation: fill 5.5s cubic-bezier(.4, .1, .3, 1) .2s forwards; }
+@keyframes fill { to { width: 100%; } }
+
+.foot { position: absolute; left: 14px; right: 14px; bottom: 10px; display: flex; justify-content: space-between; font: 10px "Segoe UI"; color: #7f95c4; }
+.frame { position: absolute; inset: 0; border: 1px solid rgba(160, 190, 255, .35); pointer-events: none; }
+
+/* First-skip prompt, styled like the main window's dialogs. */
+.overlay { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center; background: rgba(4, 10, 26, .55); }
+.dialog { width: 400px; background: linear-gradient(#25458a, #0f2250); border: 1px solid #4f78c4; box-shadow: 0 12px 40px rgba(0, 0, 0, .6); }
+.dialog .dt { height: 26px; display: flex; align-items: center; gap: 7px; padding: 0 8px; background: linear-gradient(#2a2a2a, #0d0d0d); font-size: 12px; color: #ddd; }
+.dialog .dt img { width: 16px; height: 16px; }
+.dialog .db { display: flex; gap: 14px; padding: 18px 18px 8px; font: 13px/1.5 "Segoe UI"; color: #e6eefc; }
+.dialog .db > img { width: 60px; height: 60px; flex: none; filter: drop-shadow(0 0 10px rgba(190, 215, 255, .5)); }
+.dialog .db h2 { margin: 0 0 4px; font: 600 17px "Segoe UI"; color: #f5a623; }
+.dialog .db p { margin: 0 0 8px; }
+.dialog .df { display: flex; justify-content: flex-end; gap: 8px; padding: 8px 14px 14px; }
+.go { min-width: 80px; height: 24px; padding: 0 14px; background: linear-gradient(#2b303a, #1b1e25); border: 1px solid #4a5262; color: #f5a623; font: 700 12px "Segoe UI"; }
+.go:hover, .go:focus-visible { background: #333a48; border-color: #f5a623; outline: none; }
+.go:active { background: #0c0e12; }
+
+/* Themes other than Bloom draw their own scene (themes.js) in place of the bloom. */
+[data-theme]:not([data-theme="bloom"]) .spin, [data-theme]:not([data-theme="bloom"]) .core,
+[data-theme]:not([data-theme="bloom"]) .arcs, [data-theme]:not([data-theme="bloom"]) .spark { display: none; }
+.theme-art { animation: fade 1.6s ease-out .2s both; }
+.cd-spin { animation: spin-cd 6s linear infinite; }
+@keyframes spin-cd { to { transform: rotate(360deg); } }
+.bubble { animation: bubble-rise 6s linear infinite; }
+@keyframes bubble-rise { from { transform: translateY(40px); opacity: 0; } 15% { opacity: 1; } to { transform: translateY(-260px); opacity: 0; } }
+[data-theme="classic"] svg.bg rect:first-of-type { fill: #008080; }
+[data-theme="classic"] .bar { background: #fff; border: 2px solid; border-color: #808080 #fff #fff #808080; height: 8px; }
+[data-theme="classic"] .bar i { background: repeating-linear-gradient(90deg, #000080 0 10px, transparent 10px 12px); box-shadow: none; }
+[data-theme="classic"] .frame { border-color: #c0c0c0; }
+[data-theme="classic"] #shade stop { stop-opacity: 0; }
+[data-theme="classic"] .load { bottom: 30px; }
+[data-theme="classic"] .foot { color: #d8f0f0; }
+[data-theme="classic"] .status { margin-bottom: 4px; }

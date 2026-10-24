@@ -1,0 +1,8 @@
+{
+  "appId": "com.example.pocketpedia",
+  "appName": "PocketPedia",
+  "webDir": "www",
+  "backgroundColor": "#0f2250",
+  "server": { "androidScheme": "https" },
+  "android": { "backgroundColor": "#0f2250" }
+}

@@ -1,0 +1,82 @@
+/* Phone layout. The desktop styles assume a 1000px+ window with a title bar, so this reshapes the chrome. */
+html, body { height: 100%; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+body { -webkit-user-select: none; user-select: none; }
+.text, input, textarea { -webkit-user-select: text; user-select: text; }
+#app { height: 100dvh; padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0); box-sizing: border-box; }
+
+/* No window frame on a phone */
+.titlebar { display: none; }
+
+/* Menu bar: bigger tap targets; dropdowns span the screen width */
+.menubar { height: 36px; position: relative; padding: 0 2px; font-size: 13.5px; overflow: visible; }
+.menubar .m { position: static; line-height: 36px; padding: 0 7px; font-size: 13.5px; }
+.menubar .menu, .menu { left: 4px !important; right: 4px; top: 36px; min-width: 0; max-width: none; width: auto; max-height: 70dvh; overflow-y: auto; }
+.menu .mi { min-height: 40px; align-items: center; font-size: 15px; }
+.menu .msep { margin: 4px 2px; }
+.menu .mi .k { display: none; }   /* keyboard shortcuts mean nothing on a phone */
+
+/* Toolbar: search on its own row, buttons wrap/scroll below */
+.toolbar { height: auto; flex-wrap: wrap; padding: 5px 6px; gap: 4px; row-gap: 4px; }
+.toolbar .tsep { display: none; }
+.toolbar .find { order: -1; flex: 1 1 100%; width: 100%; }
+.toolbar .find label { display: none; }
+.toolbar .field { flex: 1 1 auto; width: auto; min-width: 0; height: 36px; }
+.field input { font-size: 16px !important; }
+.toolbar .go { height: 36px; padding: 0 12px; }
+.tbtn { height: 36px; min-width: 38px; padding: 0 8px; }
+.tbtn.lbl { font-size: 0; gap: 0; }   /* icon-only so the buttons fit one row */
+.tbtn.lbl .ic, .tbtn.lbl img { margin: 0; }
+[data-cmd="print"], [data-cmd="copy"], #vol { display: none; }
+
+/* Status bar: keep the status text and the connection light */
+.statusbar { height: 28px; font-size: 12px; }
+.statusbar .sb:not(.grow):not(.netbtn) { display: none; }
+
+/* Favorites pane slides over the page instead of squeezing it */
+.stage { position: relative; min-height: 0; }
+.fpane { position: absolute; top: 0; right: 0; bottom: 0; width: min(88vw, 340px); z-index: 25; box-shadow: -8px 0 24px rgba(0, 0, 0, .5); }
+
+/* Dialogs fit the screen */
+.dialog { max-width: calc(100vw - 16px); max-height: calc(100dvh - 24px); overflow: auto; }
+.options { width: calc(100vw - 16px) !important; }
+
+/* Home screen: the desktop canvas is a fixed 1024x610 picture; on a phone it becomes a scrolling column */
+@media (max-width: 760px) {
+  .home { overflow-y: auto; overflow-x: hidden; }
+  .home-canvas { position: static; width: auto; height: auto; transform: none !important; display: flex; flex-direction: column; align-items: stretch; gap: 14px; padding: 16px 14px 28px; }
+  .home-art { position: absolute; inset: 0; height: 100%; }
+  .home .brand, .home .dial, .home .dialcap, .home .disc, .home .shelf, .home .alm { position: relative; left: auto; right: auto; top: auto; bottom: auto; width: auto; }
+  .home .brand { text-align: center; }
+  .home .dial { align-self: center; width: min(72vw, 280px); height: min(72vw, 280px); flex: none; }
+  .home .dialcap { align-self: center; width: min(92vw, 330px); text-align: center; }
+  .home .shelf { height: auto; padding-bottom: 12px; }
+  .home .shelf .row { flex-wrap: wrap; gap: 14px 0; margin-top: 12px; }
+  .home .shelf .orb { flex: 0 0 33.33%; }
+  .home .alm { height: auto; }
+  .home .alm .list { overflow: visible; }
+  .home .brand { order: 1; } .home .dial { order: 2; } .home .dialcap { order: 3; } .home .disc { order: 4; } .home .shelf { order: 5; } .home .alm { order: 6; }
+}
+
+/* Pages (articles, Media, Timeline, games...): the side rail becomes a slide-in drawer */
+@media (max-width: 760px) {
+  .page .rail { position: absolute; left: 0; top: 0; bottom: 0; width: min(82vw, 300px); z-index: 30; transform: translateX(-104%); transition: transform .2s ease; }
+  .page.rail-open .rail { transform: none; box-shadow: 6px 0 24px rgba(0, 0, 0, .55); }
+  .page .art { width: 100%; min-width: 0; }
+  .rail-toggle { position: absolute; top: 8px; left: 8px; z-index: 25; width: 38px; height: 38px; border: 1px solid rgba(255, 255, 255, .35); border-radius: 6px;
+    background: rgba(8, 18, 48, .75); color: #fff; font-size: 20px; line-height: 1; padding: 0; }
+  .page.rail-open .rail-toggle { visibility: hidden; }
+
+  .band, .band.article { height: auto; min-height: 56px; display: flex; flex-direction: column; }
+  .band > svg { z-index: 0; }
+  .band .t, .band.article .t { position: relative; left: auto; right: auto; top: auto; bottom: auto; padding: 8px 12px 8px 54px; min-width: 0; }
+  .band .tools { position: relative; right: auto; left: auto; top: auto; bottom: auto; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px 0 54px; z-index: 1; }
+  .band.article .tools { order: -1; }
+  .band h1 { font-size: 24px; }
+
+  .content { flex-direction: column; align-items: stretch; gap: 14px; padding: 12px 14px 28px; }
+  .content.article .media, .media { float: none; width: auto; margin: 0 0 14px; }
+  .content.article .flow { max-width: none; }
+  .text img, .text table { max-width: 100%; }
+  .text .infobox, .text table.infobox { float: none; width: 100% !important; margin: 0 0 14px; }
+  .text table { display: block; overflow-x: auto; }
+}

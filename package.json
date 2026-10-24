@@ -1,0 +1,25 @@
+{
+  "name": "pocketpedia",
+  "version": "0.5.0",
+  "private": true,
+  "description": "PocketPedia: an Android port of Encyclopedia 2000, a nostalgic desktop encyclopedia powered by Wikipedia",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "serve": "python3 -m http.server 8080 -d www",
+    "android:add": "cap add android",
+    "android:icons": "capacitor-assets generate --android",
+    "android:sync": "cap sync android",
+    "android:open": "cap open android",
+    "android:apk": "cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/browser": "^6.0.0",
+    "@capacitor/core": "^6.2.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^6.2.0"
+  }
+}

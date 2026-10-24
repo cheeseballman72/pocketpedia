@@ -1,0 +1,320 @@
+/* ---------- Activities page (reuses the Games page card styles) ---------- */
+.pt-art { display: grid; grid-template-columns: repeat(6, 34px); grid-template-rows: repeat(2, 34px); gap: 4px; place-content: center; height: 100%; }
+.pt-art i { display: grid; place-items: center; font: 700 13px "Segoe UI"; font-style: normal; color: #1a1a2e; border-radius: 3px;
+            background: linear-gradient(rgba(255, 255, 255, .45), rgba(255, 255, 255, 0) 55%), var(--c); box-shadow: 0 1px 3px rgba(0, 0, 0, .4); }
+
+/* ---------- Periodic Table ---------- */
+.pt { background: var(--scene); }
+.pt-holder { position: absolute; inset: 0; overflow: hidden; }
+.pt-canvas { position: absolute; left: 50%; top: 50%; width: 1024px; height: 610px; transform: translate(-50%, -50%) scale(var(--s, 1)); color: #fff; }
+.pt-head { position: absolute; left: 30px; top: 20px; }
+.pt-head h1 { margin: 0; font: 300 30px/1.1 "Segoe UI"; }
+
+.pt-el { position: absolute; width: 43px; height: 43px; padding: 0; border: 1px solid rgba(0, 0, 0, .45); border-radius: 3px; color: #141a2e;
+         background: linear-gradient(rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 52%), var(--c);
+         box-shadow: 0 1px 3px rgba(0, 0, 0, .35); transition: transform .1s, opacity .15s, box-shadow .1s; }
+.pt-el i { position: absolute; left: 4px; top: 2px; font: 600 9px "Segoe UI"; font-style: normal; opacity: .8; }
+.pt-el b { display: block; margin-top: 9px; font: 700 18px "Segoe UI"; }
+.pt-el:hover { transform: scale(1.12); z-index: 2; box-shadow: 0 3px 10px rgba(0, 0, 0, .6); }
+.pt-el.sel { z-index: 3; outline: 2px solid #fff; outline-offset: 1px; box-shadow: 0 0 14px rgba(255, 255, 255, .55); }
+.pt-el.dim, .pt-ph.dim { opacity: .18; }
+.pt-ph { position: absolute; width: 43px; height: 43px; display: grid; place-items: center; font: 600 10px "Segoe UI"; color: #141a2e; border-radius: 3px;
+         background: var(--c); opacity: .55; border: 1px dashed rgba(0, 0, 0, .45); }
+
+.pt-card { position: absolute; display: flex; gap: 14px; padding: 10px 12px; overflow: hidden;
+           background: linear-gradient(rgba(var(--glass), .82), rgba(var(--glass), .65)); border: 1px solid rgba(var(--edge), .3); box-shadow: 0 6px 20px rgba(0, 0, 0, .35); }
+.pt-intro b { display: block; font: 600 16px "Segoe UI"; color: var(--orange); margin-bottom: 4px; }
+.pt-intro p { margin: 0; font: 13px/1.5 "Segoe UI"; color: #cfdcf5; }
+.pt-big { flex: none; position: relative; width: 112px; height: 112px; border-radius: 5px; color: #141a2e; text-align: center;
+          background: linear-gradient(rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 52%), var(--c); border: 1px solid rgba(0, 0, 0, .45); }
+.pt-big i { position: absolute; left: 8px; top: 5px; font: 600 13px "Segoe UI"; font-style: normal; }
+.pt-big b { display: block; margin-top: 18px; font: 700 44px/1 "Segoe UI"; }
+.pt-big span { display: block; margin-top: 4px; font: 600 11px "Segoe UI"; }
+.pt-big small { display: block; font: 10.5px "Segoe UI"; opacity: .8; }
+.pt-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pt-info h2 { margin: 0; font: 300 22px/1.1 "Segoe UI"; }
+.pt-tags { display: flex; flex-wrap: wrap; gap: 4px 10px; margin: 4px 0 4px; font: 11.5px "Segoe UI"; color: var(--sky); }
+.pt-tags .chip { padding: 0 6px; font-weight: 600; color: #141a2e; background: var(--c); border-radius: 2px; }
+.pt-sum { margin: 0 0 6px; max-height: 2.8em; font: 12px/1.4 "Segoe UI"; color: #e6eefc; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pt-read { align-self: flex-start; margin-top: 2px; }
+
+.pt-key { position: absolute; width: 130px; display: flex; flex-direction: column; gap: 2px; }
+.pt-key small { margin-bottom: 4px; font: 600 10.5px "Segoe UI"; letter-spacing: 3px; color: var(--orange); }
+.pt-fam { display: flex; align-items: center; gap: 7px; padding: 3px 5px; text-align: left; background: none; border: 1px solid transparent; color: #e6eefc; font: 11px/1.2 "Segoe UI"; }
+.pt-fam i { flex: none; width: 13px; height: 13px; border-radius: 2px; border: 1px solid rgba(0, 0, 0, .45); }
+.pt-fam:hover { background: rgba(var(--deep), .5); border-color: rgba(var(--edge), .3); }
+.pt-fam.on { background: rgba(245, 166, 35, .18); border-color: var(--orange); color: #fff; }
+.pt-fam.all { margin-top: 4px; color: var(--sky); }
+.pt-hint { position: absolute; margin: 0; font: 12px "Segoe UI"; color: var(--sky); }
+
+/* ---------- Shared pieces for the newer activities ---------- */
+.act { color: #fff; background: var(--scene); }
+/* The title strip above an activity's content (which starts 82px down): the title and any controls beside it are centered in it. */
+.act-head { position: absolute; left: 24px; top: 0; right: 24px; height: 82px; display: flex; align-items: center; gap: 18px; z-index: 2; }
+.act-head h1 { margin: 0; font: 300 30px/1.1 "Segoe UI"; white-space: nowrap; }
+.act-panel { min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+             background: linear-gradient(rgba(var(--glass), .82), rgba(var(--glass), .62)); border: 1px solid rgba(var(--edge), .3); box-shadow: 0 6px 20px rgba(0, 0, 0, .3); }
+.act-card { position: absolute; display: flex; flex-direction: column; overflow: hidden; z-index: 2;
+            background: linear-gradient(rgba(var(--glass), .88), rgba(var(--glass), .72)); border: 1px solid rgba(var(--edge), .3); box-shadow: 0 6px 20px rgba(0, 0, 0, .35); }
+.act-cb { flex: 1; overflow: auto; padding: 12px 16px 14px; }
+.act-cb small { font: 600 10.5px "Segoe UI"; letter-spacing: 3px; color: var(--orange); }
+.act-cb h2 { margin: 0; font: 300 28px/1.15 "Segoe UI"; }
+.act-cb .desc { min-height: 1.3em; margin: 2px 0 10px; font: 12.5px "Segoe UI"; color: var(--sky); }
+.act-facts { width: 100%; border-collapse: collapse; margin-bottom: 10px; font: 12.5px "Segoe UI"; }
+.act-facts td { padding: 4px 0; border-bottom: 1px solid rgba(var(--edge), .16); vertical-align: top; }
+.act-facts td:first-child { width: 120px; padding-right: 8px; color: var(--sky); }
+.act-sum { margin: 0 0 12px; font: 12.5px/1.5 "Segoe UI"; color: #e6eefc; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.act-note { margin: 16px 4px; font: italic 13px "Segoe UI"; color: var(--sky); }
+.act-scroll { flex: 1; min-height: 0; overflow: hidden auto; padding-right: 6px; }
+.act-scroll::-webkit-scrollbar, .act-cb::-webkit-scrollbar { width: 12px; }
+.act-scroll::-webkit-scrollbar-track, .act-cb::-webkit-scrollbar-track { background: transparent; }
+.act-scroll::-webkit-scrollbar-thumb, .act-cb::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .25); border: 3px solid transparent; background-clip: padding-box; }
+.act-chip { height: 24px; padding: 0 10px 2px; line-height: 1; background: rgba(var(--deep), .45); border: 1px solid rgba(var(--edge), .28); color: #cfdcf5; font: 12px "Segoe UI"; white-space: nowrap; }
+.act-chip:hover { border-color: var(--orange); color: #fff; }
+.act-chip.on { background: rgba(245, 166, 35, .2); border-color: var(--orange); color: #fff; font-weight: 600; }
+.act input, .act select { height: 24px; padding: 0 6px; border: 1px solid #4a5262; background: #0a0c10; color: #fff; font: 12px "Segoe UI"; outline: none; }
+.act input:focus, .act select:focus { border-color: var(--orange); }
+.act input::placeholder { color: #6d7588; }
+.act-field { position: relative; }
+.act-sug { position: absolute; left: 0; right: 0; top: 25px; background: #16181d; border: 1px solid #4a5262; box-shadow: 0 6px 16px rgba(0, 0, 0, .5); z-index: 5; }
+.act-sug[hidden] { display: none; }
+.act-si { padding: 4px 8px; font: 12px "Segoe UI"; color: #e8e8e8; cursor: default; }
+.act-si b { display: block; font-weight: 600; }
+.act-si span { display: block; font-size: 11px; color: #8a93a6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.act-si.sel { background: var(--ink-2); }
+
+/* ---------- The Day You Were Born ---------- */
+.bd-pick { display: flex; align-items: center; gap: 6px; margin-left: auto; font: 12px "Segoe UI"; color: var(--sky); }
+.bd-pick input { width: 62px; }
+.bd-pick .go { margin-left: 4px; }
+.bd-body { position: absolute; left: 24px; right: 24px; top: 82px; bottom: 16px; display: grid; grid-template-columns: 380px 1fr; gap: 16px; }
+.bd-body .act-panel { padding: 18px 20px; }
+.bd-date small { font: 600 10.5px "Segoe UI"; letter-spacing: 3px; color: var(--sky); }
+.bd-date .wd { margin-top: 4px; font: 300 18px "Segoe UI"; color: #cfdcf5; }
+.bd-date .big { font: 300 46px/1.05 "Segoe UI"; }
+.bd-date .yr { font: 600 60px/1 "Segoe UI"; color: var(--orange); letter-spacing: 2px; }
+.bd-line { margin: 14px 0 0; font: 13.5px/1.6 "Segoe UI"; color: #e6eefc; }
+.bd-line b { color: #fff; font-weight: 600; }
+.bd-headline { margin-top: auto; padding: 12px 14px; background: rgba(245, 166, 35, .14); border-left: 3px solid var(--orange); }
+.bd-headline[hidden] { display: none; }
+.bd-headline small { display: block; margin-bottom: 4px; font: 600 10px "Segoe UI"; letter-spacing: 2px; color: var(--orange); }
+.bd-headline p { margin: 0 0 10px; font: 13.5px/1.5 "Segoe UI"; color: #fff; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+.bd-headline .go { margin: 0; }
+.bd-tabs { flex: none; display: flex; gap: 2px; margin: -4px 0 12px; border-bottom: 1px solid rgba(255, 255, 255, .25); }
+.bd-tabs button { padding: 6px 14px 7px; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; color: var(--sky); font: 600 14px "Segoe UI"; }
+.bd-tabs button.on { color: var(--orange); border-bottom-color: var(--orange); }
+.bd-tabs button:hover { color: #fff; }
+.bd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+.bd-person { display: flex; gap: 12px; align-items: center; min-width: 0; padding: 6px; background: none; border: 1px solid transparent; text-align: left; color: #fff; }
+.bd-person:hover { background: rgba(var(--deep), .45); border-color: rgba(var(--edge), .3); }
+.bd-person i { flex: none; width: 48px; height: 48px; border-radius: 50%; background: #1c3566 center/cover; border: 2px solid rgba(255, 255, 255, .7); box-shadow: 0 1px 4px rgba(0, 0, 0, .5); }
+.bd-person div { min-width: 0; }
+.bd-person b { display: block; font: 600 13.5px "Segoe UI"; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bd-person span { display: block; font: 12px "Segoe UI"; color: var(--sky); }
+.bd-ev { display: flex; gap: 14px; width: 100%; padding: 8px 4px; background: none; border: 0; border-bottom: 1px solid rgba(var(--edge), .12); text-align: left; font: 13px/1.5 "Segoe UI"; color: #e6eefc; }
+.bd-ev:not(:disabled):hover { background: rgba(var(--deep), .4); color: #fff; }
+.bd-ev em { flex: none; width: 48px; font: 600 13px "Segoe UI"; font-style: normal; color: var(--orange); }
+.bd-art { display: grid; place-content: center; height: 100%; text-align: center; color: #fff; }
+.bd-art small { font: 600 11px "Segoe UI"; letter-spacing: 4px; color: var(--sky); }
+.bd-art b { font: 300 52px/1 "Segoe UI"; }
+.bd-art span { font: 700 22px/1 "Segoe UI"; letter-spacing: 2px; color: var(--orange); }
+
+/* ---------- The Solar System ---------- */
+.ss { background: radial-gradient(ellipse at 38% 50%, #13265a, #071330 55%, #030817); }
+.ss-map { position: absolute; left: 0; top: 0; right: 360px; bottom: 0; }
+.ss-svg { width: 100%; height: 100%; display: block; }
+.ss-date { margin-top: 3px; font: 12px "Segoe UI"; color: var(--sky); }
+.ss-ctl { position: absolute; left: 24px; bottom: 18px; display: flex; align-items: center; gap: 6px; z-index: 2; font: 12px "Segoe UI"; color: var(--sky); }
+.ss-ctl .lbl { margin: 0 4px 0 10px; }
+.ss-play { display: inline-grid; justify-items: center; align-items: center; align-content: center; }
+.ss-play span { grid-area: 1 / 1; }
+.ss-play .r, .ss-play.paused .p { visibility: hidden; }
+.ss-play.paused .r { visibility: visible; }
+.ss-orbit { fill: none; stroke: #9fb4e6; stroke-opacity: .22; stroke-width: 1; }
+.ss-orbit.sel { stroke: var(--orange); stroke-opacity: .75; stroke-dasharray: 3 4; }
+.ss-body { cursor: default; }
+.ss-hit { fill: transparent; }
+.ss-ring { fill: none; stroke: #fff; stroke-width: 1.5; opacity: 0; }
+.ss-body.sel .ss-ring { opacity: .85; }
+.ss-body:hover .ss-ring { opacity: .45; }
+.ss-lbl { font: 600 11.5px "Segoe UI"; fill: #cfdcf5; paint-order: stroke; stroke: #071330; stroke-width: 3px; pointer-events: none; }
+.ss-body.sel .ss-lbl { fill: #ffd27a; font-size: 13px; }
+.ss-card { right: 16px; top: 16px; bottom: 16px; width: 330px; }
+.ss-pic { height: 170px; flex: none; background: #000 center/cover no-repeat; border-bottom: 1px solid rgba(var(--edge), .2); }
+.ss-note { margin: 0 0 6px; font: 12px/1.45 "Segoe UI"; color: #ffd27a; }
+.ss-note + .act-sum { margin-top: 10px; }
+.ss-art { width: 100%; height: 100%; }
+
+/* ---------- Lifelines ---------- */
+.ll-add { display: flex; margin-left: auto; }
+.ll-add input { width: 230px; }
+.ll-sets { position: absolute; left: 24px; right: 24px; top: 82px; display: flex; gap: 4px; align-items: center; font: 12px "Segoe UI"; color: var(--sky); }
+.ll-sets > span { margin-right: 6px; }
+.ll-sets .clr { margin-left: 10px; }
+.ll-chart { position: absolute; left: 24px; right: 24px; top: 122px; bottom: 98px; padding-top: 34px; }
+.ll-axis { position: absolute; left: 216px; right: 40px; top: 8px; bottom: 0; pointer-events: none; }
+.ll-tick { position: absolute; top: 0; bottom: 0; border-left: 1px solid rgba(var(--edge), .14); }
+.ll-tick span { position: absolute; left: 4px; top: 0; font: 600 11px "Segoe UI"; color: var(--sky); white-space: nowrap; }
+.ll-tick.end span { left: auto; right: 4px; }
+.ll-mark { position: absolute; top: 0; bottom: 0; border-left: 1px dashed var(--orange); z-index: 2; }
+.ll-mark[hidden] { display: none; }
+.ll-mark b { position: absolute; top: 0; left: -26px; width: 52px; padding: 1px 0; text-align: center; background: var(--orange); color: #1a1a2e; font: 700 11px "Segoe UI"; }
+.ll-rows { position: relative; height: 100%; overflow: hidden auto; }
+.ll-rows::-webkit-scrollbar { width: 12px; }
+.ll-rows::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .25); border: 3px solid transparent; background-clip: padding-box; }
+.ll-row { position: relative; height: 42px; }
+.ll-row:hover { background: rgba(var(--deep), .3); }
+.ll-row.sel { background: linear-gradient(90deg, rgba(245, 166, 35, .16), rgba(245, 166, 35, 0) 40%); }
+.ll-who { position: absolute; left: 12px; width: 194px; top: 5px; display: flex; gap: 8px; align-items: center; }
+.ll-who i { flex: none; width: 32px; height: 32px; border-radius: 50%; background: #1c3566 center/cover; border: 2px solid rgba(255, 255, 255, .7); }
+.ll-who div { min-width: 0; }
+.ll-who b { display: block; font: 600 12.5px/1.2 "Segoe UI"; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ll-who span { display: block; font: 11px "Segoe UI"; color: var(--sky); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ll-lane { position: absolute; left: 216px; right: 40px; top: 0; bottom: 0; }
+.ll-bar { position: absolute; top: 11px; height: 20px; border-radius: 3px; box-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+          background: linear-gradient(rgba(255, 255, 255, .45), rgba(255, 255, 255, 0) 60%), var(--c); }
+.ll-bar.alive { border-radius: 3px 0 0 3px; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 18px), rgba(0, 0, 0, .35)); }
+.ll-bar.sel { outline: 2px solid #fff; outline-offset: 1px; }
+.ll-bar.out em { left: calc(100% + 8px); color: #cfdcf5; }
+.ll-bar.out-left em { left: auto; right: calc(100% + 8px); color: #cfdcf5; }
+.ll-bar em { position: absolute; left: 6px; top: 2px; font: 600 11px "Segoe UI"; font-style: normal; color: #141a2e; white-space: nowrap; }
+.ll-x { position: absolute; right: 8px; top: 10px; width: 22px; height: 22px; padding: 0 0 2px; background: none; border: 1px solid transparent; color: var(--sky); font: 16px/1 "Segoe UI"; opacity: 0; }
+.ll-row:hover .ll-x { opacity: 1; }
+.ll-x:hover { color: #fff; border-color: rgba(var(--edge), .35); }
+.ll-foot { position: absolute; left: 24px; right: 24px; bottom: 16px; height: 68px; flex-direction: row; gap: 14px; align-items: center; padding: 0 16px; font: 13px/1.45 "Segoe UI"; color: #e6eefc; }
+.ll-foot > div { flex: 1; min-width: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ll-foot b { color: #ffd27a; font-weight: 600; }
+.ll-foot small { display: block; font: 600 10.5px "Segoe UI"; letter-spacing: 3px; color: var(--orange); }
+.ll-foot .go { flex: none; margin: 0; }
+.ll-art { display: flex; flex-direction: column; justify-content: center; gap: 7px; height: 100%; padding: 0 18px; }
+.ll-art i { display: block; height: 12px; border-radius: 2px; background: linear-gradient(rgba(255, 255, 255, .45), rgba(255, 255, 255, 0) 60%), var(--c); box-shadow: 0 1px 3px rgba(0, 0, 0, .4); }
+
+/* ---------- World Clock ---------- */
+.wc-map { position: absolute; left: 10px; top: 84px; right: 370px; bottom: 50px; }
+.wc-svg { width: 100%; height: 100%; display: block; touch-action: none; }
+/* Fade the edges like World Explorer, so a zoomed-in map melts into the background. */
+.wc-map-in { position: absolute; inset: 0; -webkit-mask-image: linear-gradient(to right, transparent, #000 18px, #000 calc(100% - 18px), transparent), linear-gradient(to bottom, transparent, #000 22px, #000 calc(100% - 22px), transparent);
+          -webkit-mask-composite: source-in; mask-composite: intersect; }
+.wc-svg.dragging { cursor: grabbing; }
+.wc-zoom { left: 14px; bottom: 6px; }
+.wc-loading { position: absolute; inset: 0; display: grid; place-items: center; font: 13px "Segoe UI"; color: var(--sky); }
+.wc-ocean { fill: rgba(var(--deep), .35); stroke: rgba(var(--edge), .25); stroke-width: .8px; vector-effect: non-scaling-stroke; }
+.wc-land { fill: #cfe0f5; fill-opacity: .78; stroke: #0f2250; stroke-width: .5px; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.wc-night { fill: #030a1c; fill-opacity: .55; pointer-events: none; }
+.wc-sundot { pointer-events: none; }
+.wc-dot { cursor: default; }
+.wc-dot .hit { fill: transparent; }
+.wc-dot circle:not(.hit) { fill: #fff; fill-opacity: .55; stroke: #0f2250; stroke-width: .8px; }
+.wc-dot:hover circle:not(.hit) { fill: #ffd27a; fill-opacity: 1; }
+.wc-dot.on circle:not(.hit) { fill: var(--orange); fill-opacity: 1; stroke: #fff; stroke-width: 1px; }
+.wc-lbl { font: 600 10.5px "Segoe UI"; fill: #fff; paint-order: stroke; stroke: #071330; stroke-width: 3px; pointer-events: none; }
+.wc-hint { position: absolute; left: 62px; bottom: 18px; right: 380px; font: 12px "Segoe UI"; color: var(--sky); z-index: 2; }
+.wc-card { right: 16px; top: 16px; bottom: 16px; width: 338px; }
+.wc-card .act-cb > small { font: 600 10.5px "Segoe UI"; letter-spacing: 3px; color: var(--orange); }
+.wc-top { display: flex; align-items: center; gap: 14px; margin: 8px 0 4px; }
+.wc-face { flex: none; width: 92px; height: 92px; }
+.wc-face .rim { fill: rgba(var(--deep), .55); stroke: rgba(var(--edge), .6); stroke-width: 2; }
+.wc-face .tick { stroke: #cfdcf5; stroke-width: 2; stroke-linecap: round; }
+.wc-face .hr { stroke: #fff; stroke-width: 4; stroke-linecap: round; }
+.wc-face .mn { stroke: #fff; stroke-width: 2.6; stroke-linecap: round; }
+.wc-face .sc { stroke: var(--orange); stroke-width: 1.2; stroke-linecap: round; }
+.wc-face .pin { fill: var(--orange); }
+.wc-big { font: 300 30px/1.1 "Segoe UI"; white-space: nowrap; }
+.wc-date { margin-top: 2px; font: 12.5px "Segoe UI"; color: #e6eefc; }
+.wc-zone { margin-top: 2px; font: 12px "Segoe UI"; color: var(--sky); }
+.wc-lh { margin: 14px 0 4px; padding-bottom: 4px; font: 600 15px "Segoe UI"; color: var(--orange); border-bottom: 1px solid rgba(255, 255, 255, .25); }
+.wc-row { display: flex; align-items: center; gap: 10px; padding: 4px 0; border-bottom: 1px solid rgba(var(--edge), .16); }
+.wc-sky { flex: none; width: 22px; text-align: center; font: 15px "Segoe UI Symbol", "Segoe UI"; font-style: normal; }
+.wc-row.day .wc-sky { color: #ffd27a; }
+.wc-row.night .wc-sky { color: #aac0e6; }
+.wc-city { flex: 1; min-width: 0; }
+.wc-city b { display: block; font: 600 13px "Segoe UI"; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wc-city span { display: block; font: 11.5px "Segoe UI"; color: var(--sky); }
+.wc-t { font: 300 20px "Segoe UI"; white-space: nowrap; }
+.wc-x { width: 20px; height: 20px; padding: 0 0 2px; border: 1px solid transparent; background: none; color: #8a93a6; font: 14px/1 "Segoe UI"; }
+.wc-x:hover { color: #fff; border-color: rgba(var(--edge), .4); }
+.wc-dst { margin-left: 6px; padding: 0 5px 1px; font: 600 9.5px/1.4 "Segoe UI"; font-style: normal; letter-spacing: .5px; color: #141a2e; background: #9fe0b4; border-radius: 2px; vertical-align: 1px; }
+.wc-zone .wc-dst { display: inline-block; margin: 3px 0 0; padding: 0 6px 1px; font-size: 10.5px; letter-spacing: 0; }
+.wc-restore { display: block; margin: 8px 0 0; padding: 0; border: 0; background: none; color: var(--sky); font: 12px "Segoe UI"; text-decoration: underline; text-decoration-color: rgba(170, 192, 230, .4); }
+.wc-restore:hover { color: var(--gold); }
+.wc-restore[hidden] { display: none; }
+.wc-empty { padding: 10px 0; font: 12.5px "Segoe UI"; color: var(--sky); }
+.wc-addrow { position: relative; margin-top: 10px; }
+.wc-add { width: 100%; height: 26px; padding: 0 8px; border: 1px solid #4a5262; background: #0a0c10; color: #fff; font: 12px "Segoe UI"; outline: none; }
+.wc-add:focus { border-color: var(--orange); }
+.wc-add::placeholder { color: #6d7588; }
+.wc-sug { position: absolute; left: 0; right: 0; bottom: 27px; background: #16181d; border: 1px solid #4a5262; box-shadow: 0 -6px 16px rgba(0, 0, 0, .5); z-index: 5; }
+.wc-sug[hidden] { display: none; }
+.wc-si { display: flex; justify-content: space-between; gap: 8px; padding: 4px 8px; font: 12px "Segoe UI"; color: #e8e8e8; }
+.wc-si span { color: #8a93a6; font-size: 11px; }
+.wc-si.sel { background: var(--ink-2); }
+.wc-si.none { color: #8a93a6; }
+.wc-art { width: 100%; height: 100%; }
+
+/* ---------- Activities page: groups ---------- */
+.act-group:not([hidden]) ~ .act-group { margin-top: 26px; }
+.act-group[hidden] { display: none; }
+.band .tools .wx-chip { height: 26px; }
+.act-group > h3 { margin: 0 0 10px; padding-bottom: 6px; font: 600 11px "Segoe UI"; letter-spacing: 3px; color: var(--ink-2); border-bottom: 1px solid #d7deec; text-transform: uppercase; }
+.act-group > h3 span { margin-left: 8px; font-weight: 400; letter-spacing: 0; color: #8a93a6; text-transform: none; }
+
+/* ---------- Almanac Calendar ---------- */
+.ac-cal { position: absolute; left: 24px; top: 84px; right: 376px; bottom: 16px; display: flex; flex-direction: column; }
+.ac-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.ac-title { min-width: 190px; margin: 0 6px; font: 300 24px/1 "Segoe UI"; text-align: center; white-space: nowrap; }
+.ac-for { margin-left: auto; font: 12px "Segoe UI"; color: var(--sky); }
+.ac-city { height: 24px; max-width: 210px; padding: 0 4px; border: 1px solid #4a5262; background: #0a0c10; color: #fff; font: 12px "Segoe UI"; }
+.ac-dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
+.ac-dow span { font: 600 10.5px "Segoe UI"; letter-spacing: 2px; color: var(--orange); text-transform: uppercase; text-align: center; }
+.ac-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; gap: 4px; }
+.ac-day { position: relative; min-height: 0; padding: 4px 5px; display: flex; flex-direction: column; align-items: center; gap: 2px; overflow: hidden;
+          background: rgba(var(--deep), .45); border: 1px solid rgba(var(--edge), .2); color: #e6eefc; text-align: center; }
+.ac-day.blank { background: none; border-color: transparent; }
+.ac-day b { align-self: flex-start; font: 600 12.5px "Segoe UI"; }
+.ac-day:hover { border-color: rgba(245, 166, 35, .6); }
+.ac-day.today b { color: #ffd27a; }
+.ac-day.today { border-color: rgba(255, 210, 122, .5); }
+.ac-day.sel { background: rgba(245, 166, 35, .18); border-color: var(--orange); box-shadow: inset 0 0 0 1px var(--orange); }
+.ac-day.full { background: rgba(var(--deep), .6); }
+.ac-day .ac-moon { width: 20px; height: 20px; margin-top: -4px; flex: none; }
+.ac-moon .dark { fill: #1b2a52; stroke: rgba(255, 255, 255, .25); stroke-width: .5; }
+.ac-moon .lit { fill: #f4ecd0; }
+.ac-tag { max-width: 100%; font: 10.5px/1.2 "Segoe UI"; color: var(--sky); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ac-tag.moon { color: #ffd27a; font-weight: 600; }
+.ac-tag.season { color: #9fe0b4; font-weight: 600; }
+.ac-tag.dst { color: #f5a6c8; }
+.ac-key { margin-top: 8px; font: 11.5px "Segoe UI"; color: var(--sky); }
+.ac-card { right: 16px; top: 16px; bottom: 16px; width: 338px; }
+.ac-card .act-cb > small { font: 600 10.5px "Segoe UI"; letter-spacing: 3px; color: var(--orange); }
+.ac-card h2 { margin: 0 0 8px; font: 300 26px/1.15 "Segoe UI"; }
+.ac-moonrow { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.ac-moonrow .ac-moon { width: 48px; height: 48px; flex: none; }
+.ac-moonrow b { display: block; font: 600 15px "Segoe UI"; }
+.ac-moonrow span { display: block; font: 12px "Segoe UI"; color: var(--sky); }
+.ac-note { margin: 0 0 8px; font: 12.5px/1.45 "Segoe UI"; color: #ffd27a; }
+.ac-season { margin: 0 0 4px; font: 12.5px/1.45 "Segoe UI"; color: #e6eefc; }
+.ac-otd { display: flex; flex-direction: column; }
+.ac-ev { display: flex; gap: 10px; padding: 5px 0; text-align: left; background: none; border: 0; border-bottom: 1px solid rgba(var(--edge), .14); color: #e6eefc; font: 12px/1.4 "Segoe UI"; }
+.ac-ev b { flex: none; width: 38px; color: var(--orange); }
+.ac-ev span { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ac-ev:hover span { color: #fff; text-decoration: underline; }
+.ac-loading { padding: 6px 0; font: 12px "Segoe UI"; color: var(--sky); }
+.ac-art { width: 100%; height: 100%; }
+
+/* Units (Solar System, World Explorer): a "Units: Metric ▴" button at the bottom right of the map, beside the card,
+   whose menu opens upward. */
+.ss-units { position: absolute; right: 386px; bottom: 18px; z-index: 2; }
+.unit-menu { position: relative; }
+.unit-btn { height: 24px; padding: 0 10px 2px; background: rgba(var(--deep), .45); border: 1px solid rgba(var(--edge), .35); color: #cfdcf5; font: 12px "Segoe UI"; white-space: nowrap; }
+.unit-btn:hover, .unit-menu:has(.unit-pop:not([hidden])) .unit-btn { border-color: var(--orange); color: #fff; }
+.unit-pop { position: absolute; bottom: calc(100% + 4px); right: 0; min-width: 180px; padding: 4px; z-index: 20; background: #0e1830; border: 1px solid rgba(var(--edge), .45); box-shadow: 0 8px 24px rgba(0, 0, 0, .5); }
+/* The open menu sits above the activity's cards. */
+.ss-units:has(.unit-pop:not([hidden])), .wx-units:has(.unit-pop:not([hidden])) { z-index: 30; }
+.unit-pop .ui { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 10px; background: none; border: 0; color: #dbe5f7; font: 12px "Segoe UI"; text-align: left; white-space: nowrap; }
+.unit-pop .ui:hover { background: rgba(245, 166, 35, .16); color: #fff; }
+.unit-pop .ui em { font-style: normal; color: #8f9dbd; }
+.unit-pop .ui .rb { width: 10px; height: 10px; border-radius: 50%; border: 1px solid #8f9dbd; flex: none; }
+.unit-pop .ui.on .rb { border-color: var(--orange); background: radial-gradient(circle, var(--orange) 0 45%, transparent 50%); }
+.unit-pop .ui.on { color: #fff; font-weight: 600; }
+.unit-pop .ui .ic { width: 12px; height: 12px; fill: currentColor; flex: none; }
+.unit-pop hr { margin: 4px 6px; border: 0; border-top: 1px solid rgba(var(--edge), .3); }
